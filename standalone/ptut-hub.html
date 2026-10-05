@@ -157,6 +157,10 @@ button:disabled{opacity:.4;cursor:default}
 <div id="off" class="off" hidden>You're offline. Your timetable, tasks and exams are still available from this device.</div>
 <div id="app"></div>
 <script>
+ const supabaseClient = window.supabase.createClient(
+  "https://owiakeoybapbrfrmhcik.supabase.co",
+  "sb_publishable_KxTVXqabaSm4BXRzqtUAeA_FHt8MPf-"
+);
 var $=function(s,e){return(e||document).querySelector(s)},$$=function(s,e){return[].slice.call((e||document).querySelectorAll(s))};
 var P={home:"M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",cal:"M7 3v4M17 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z",chk:"M20 6L9 17l-5-5",ex:"M6 3h9l4 4v14H6zM14 3v5h5M9 13h6M9 17h6",bell:"M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8M10 21h4",ann:"M3 11v3l13 5V6zM19 9a4 4 0 0 1 0 6",set:"M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0",sr:"M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5",ad:"M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z",mo:"M5 12h.01M12 12h.01M19 12h.01"};
 function ic(n){return '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+P[n]+'"/></svg>'}
