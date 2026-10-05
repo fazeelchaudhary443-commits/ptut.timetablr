@@ -3,14 +3,6 @@ import react from "@vitejs/plugin-react";
 import { cpSync, existsSync, mkdirSync } from "fs";
 
 export default defineConfig({
-  plugins: [react()],
-
-  build: {
-    rollupOptions: {
-      input: "index.html"
-    }
-  },
-
   plugins: [
     react(),
     {
