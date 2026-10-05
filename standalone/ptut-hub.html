@@ -211,12 +211,78 @@ function auth(su){return '<div class="auth view"><div class="side">'+LOGO.replac
 (su?'<label for="fn">Full name</label><input id="fn" autocomplete="name">':'')+'<label for="em">Email</label><input id="em" type="email" autocomplete="email"><label for="pw">Password</label><div style="position:relative"><input id="pw" type="password" autocomplete="current-password"><button class="btn g" id="eye" style="position:absolute;right:2px;top:0;min-height:44px" type="button" aria-label="Show password">Show</button></div>'+
 (su?'<div class="bar" style="margin-top:8px"><i id="ps" style="width:0"></i></div><p class="sm mut" id="pt">Use 8+ characters with numbers.</p>':'')+
 '<p class="err" id="er" role="alert"></p><button class="btn p" id="go" style="width:100%">'+(su?"Create account":"Log in")+'</button><p class="sm mut" style="text-align:center;margin-top:14px">'+(su?'Already have an account? <a href="#/login"><b>Log in</b></a>':'No account? <a href="#/login?s=1"><b>Sign up</b></a> · <a href="#/login" id="fp"><b>Forgot password?</b></a>')+'</p></div></div></div>'}
-function authInit(su){$("#eye").onclick=function(){var p=$("#pw"),h=p.type==="password";p.type=h?"text":"password";this.textContent=h?"Hide":"Show"};
- if(su)$("#pw").oninput=function(){var v=this.value,s=Math.min(4,(v.length>7)+(/\d/.test(v))+(/[A-Z]/.test(v))+(/[^\w]/.test(v)));$("#ps").style.width=s*25+"%";$("#pt").textContent=["Too weak","Weak","Okay","Good","Strong"][s]};
- $("#go").onclick=function(){var b=this,e=$("#em").value.trim(),p=$("#pw").value;$("#er").textContent="";
-  if(!/^\S+@\S+\.\S+$/.test(e)){$("#er").textContent="Enter a valid email address.";return}
-  if(p.length<8){$("#er").textContent="Password must be at least 8 characters.";return}
-  b.classList.add("ld");setTimeout(function(){toast(su?"Account created. Let's set up your profile.":"Logged in");if(su)OS=0;location.hash=su?"#/onboarding":"#/app/home"},700)}}
+```js
+function authInit(su){
+  $("#eye").onclick=function(){
+    var p=$("#pw"),h=p.type==="password";
+    p.type=h?"text":"password";
+    this.textContent=h?"Hide":"Show";
+  };
+
+  if(su){
+    $("#pw").oninput=function(){
+      var v=this.value,
+      s=Math.min(4,
+        (v.length>7)+
+        (/\d/.test(v))+
+        (/[A-Z]/.test(v))+
+        (/[^\w]/.test(v))
+      );
+      $("#ps").style.width=s*25+"%";
+      $("#pt").textContent=["Too weak","Weak","Okay","Good","Strong"][s];
+    };
+  }
+
+  $("#go").onclick=async function(){
+    var b=this,
+        e=$("#em").value.trim(),
+        p=$("#pw").value;
+
+    $("#er").textContent="";
+
+    if(!/^\S+@\S+\.\S+$/.test(e)){
+      $("#er").textContent="Enter a valid email address.";
+      return;
+    }
+
+    if(p.length<8){
+      $("#er").textContent="Password must be at least 8 characters.";
+      return;
+    }
+
+    b.classList.add("ld");
+
+    try{
+      if(su){
+        var result=await supabaseClient.auth.signUp({
+          email:e,
+          password:p
+        });
+
+        if(result.error) throw result.error;
+
+        toast("Account created. Check your email to verify your account.");
+        OS=0;
+        location.hash="#/onboarding";
+      }else{
+        var result=await supabaseClient.auth.signInWithPassword({
+          email:e,
+          password:p
+        });
+
+        if(result.error) throw result.error;
+
+        toast("Logged in successfully.");
+        location.hash="#/app/home";
+      }
+    }catch(err){
+      $("#er").textContent=err.message || "Something went wrong.";
+    }finally{
+      b.classList.remove("ld");
+    }
+  };
+}
+```
 
 /* ---------- onboarding ---------- */
 var OS=0,OBD=[["name","Let's get to know you","Tell us what to call you."],["dept","Choose your department","We will match your classes and updates."],["prog","Select your program","Your timetable is tailored to your program."],["sem","Which semester are you in?","You can change this later in Settings."],["sec","Finally, select your section","Section announcements will appear automatically."]];
