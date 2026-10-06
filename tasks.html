@@ -300,6 +300,7 @@ body{
   gap:16px;
   padding:20px 5px;
   border-bottom:1px solid #f1f5f9;
+  position:relative;
 }
 
 .task:last-child{
@@ -376,6 +377,161 @@ body{
   color:#94a3b8;
   font-size:20px;
   cursor:pointer;
+}
+  .task-dropdown{
+  position:absolute;
+  right:45px;
+  top:55px;
+  width:190px;
+  background:white;
+  border:1px solid #e2e8f0;
+  border-radius:12px;
+  padding:7px;
+  box-shadow:0 15px 35px rgba(15,23,42,.14);
+  display:none;
+  z-index:50;
+}
+
+.task-dropdown.show{
+  display:block;
+  animation:menuIn .18s ease;
+}
+
+@keyframes menuIn{
+  from{
+    opacity:0;
+    transform:translateY(-5px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.task-dropdown button{
+  width:100%;
+  border:0;
+  background:white;
+  text-align:left;
+  padding:11px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:600;
+  color:#334155;
+}
+
+.task-dropdown button:hover{
+  background:#f1f5f9;
+}
+
+.task-dropdown .delete-option{
+  color:#dc2626;
+}
+
+.task-dropdown .delete-option:hover{
+  background:#fef2f2;
+}
+
+
+/* ================= DELETE DIALOG ================= */
+
+.delete-dialog{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.55);
+  backdrop-filter:blur(5px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:200;
+}
+
+.delete-dialog.show{
+  display:flex;
+}
+
+.delete-box{
+  width:100%;
+  max-width:410px;
+  background:white;
+  border-radius:20px;
+  padding:28px;
+  text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.22);
+  animation:dialogIn .2s ease;
+}
+
+@keyframes dialogIn{
+  from{
+    opacity:0;
+    transform:scale(.95);
+  }
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
+}
+
+.delete-icon{
+  width:58px;
+  height:58px;
+  margin:0 auto 17px;
+  border-radius:16px;
+  background:#fef2f2;
+  color:#dc2626;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+}
+
+.delete-box h3{
+  font-size:19px;
+  margin-bottom:8px;
+}
+
+.delete-box p{
+  color:#64748b;
+  font-size:13px;
+  line-height:1.6;
+  margin-bottom:23px;
+}
+
+.delete-actions{
+  display:flex;
+  gap:10px;
+}
+
+.delete-actions button{
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  font-family:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.cancel-delete{
+  background:#f1f5f9;
+  color:#334155;
+  border:1px solid #e2e8f0;
+}
+
+.confirm-delete{
+  background:#dc2626;
+  color:white;
+  border:1px solid #dc2626;
+}
+
+.cancel-delete:hover{
+  background:#e2e8f0;
+}
+
+.confirm-delete:hover{
+  background:#b91c1c;
 }
 
 /* ================= EMPTY ================= */
@@ -897,9 +1053,17 @@ body{
 </div>
 
 
+
+
 <script>
 
 const tasks = [];
+
+let currentFilter = "all";
+let deleteIndex = null;
+
+
+/* ================= STATS ================= */
 
 function updateStats(){
 
@@ -912,33 +1076,100 @@ function updateStats(){
   document.getElementById("completedTasks").textContent =
     tasks.filter(t => t.completed).length;
 
-  const today = new Date().toISOString().split("T")[0];
+  const today =
+    new Date().toISOString().split("T")[0];
 
   document.getElementById("overdueTasks").textContent =
-    tasks.filter(t => !t.completed && t.date < today).length;
+    tasks.filter(
+      t => !t.completed &&
+      t.date &&
+      t.date < today
+    ).length;
 }
 
 
+/* ================= FILTER ================= */
+
+function setFilter(filter){
+
+  currentFilter = filter;
+
+  document.querySelectorAll(".filter").forEach(button => {
+
+    button.classList.remove("active");
+
+  });
+
+  const buttons = document.querySelectorAll(".filter");
+
+  if(filter === "all"){
+    buttons[0].classList.add("active");
+  }
+
+  if(filter === "pending"){
+    buttons[1].classList.add("active");
+  }
+
+  if(filter === "completed"){
+    buttons[2].classList.add("active");
+  }
+
+  renderTasks();
+}
+
+
+/* ================= RENDER ================= */
+
 function renderTasks(){
 
-  const list = document.getElementById("taskList");
+  const list =
+    document.getElementById("taskList");
 
-  if(tasks.length === 0){
+  let filteredTasks = tasks;
+
+  if(currentFilter === "pending"){
+
+    filteredTasks =
+      tasks.filter(t => !t.completed);
+
+  }
+
+  if(currentFilter === "completed"){
+
+    filteredTasks =
+      tasks.filter(t => t.completed);
+
+  }
+
+
+  if(filteredTasks.length === 0){
+
+    let message = "No tasks found.";
+
+    if(currentFilter === "pending"){
+      message = "You have no pending tasks.";
+    }
+
+    if(currentFilter === "completed"){
+      message = "You have no completed tasks.";
+    }
 
     list.innerHTML = `
+
       <div class="empty">
 
         <div class="empty-icon">
           ✓
         </div>
 
-        <h3>No tasks yet</h3>
+        <h3>${message}</h3>
 
         <p>
-          Add your first assignment, project or academic task.
+          Your tasks will appear here.
         </p>
 
       </div>
+
     `;
 
     updateStats();
@@ -947,7 +1178,10 @@ function renderTasks(){
   }
 
 
-  list.innerHTML = tasks.map((task,index) => {
+  list.innerHTML = filteredTasks.map(task => {
+
+    const realIndex =
+      tasks.indexOf(task);
 
     let priorityClass = "low";
 
@@ -959,14 +1193,17 @@ function renderTasks(){
       priorityClass = "medium";
     }
 
+
     return `
 
       <div class="task">
 
         <div
           class="checkbox"
-          onclick="completeTask(${index})"
+          onclick="completeTask(${realIndex})"
+          title="Mark as completed"
         ></div>
+
 
         <div class="task-info">
 
@@ -988,16 +1225,51 @@ function renderTasks(){
 
         </div>
 
+
         <span class="status">
           ${task.completed ? "Completed" : "Pending"}
         </span>
 
+
         <button
           class="task-menu"
-          onclick="deleteTask(${index})"
+          onclick="toggleTaskMenu(event, ${realIndex})"
         >
           ⋮
         </button>
+
+
+        <div
+          class="task-dropdown"
+          id="menu-${realIndex}"
+        >
+
+          <button onclick="completeTask(${realIndex})">
+
+            ${task.completed
+              ? "↩ Mark as Pending"
+              : "✓ Mark as Completed"}
+
+          </button>
+
+
+          <button onclick="editTask(${realIndex})">
+
+            ✎ Edit Task
+
+          </button>
+
+
+          <button
+            class="delete-option"
+            onclick="askDelete(${realIndex})"
+          >
+
+            🗑 Delete Task
+
+          </button>
+
+        </div>
 
       </div>
 
@@ -1005,9 +1277,138 @@ function renderTasks(){
 
   }).join("");
 
+
   updateStats();
 }
 
+
+/* ================= TASK MENU ================= */
+
+function toggleTaskMenu(event,index){
+
+  event.stopPropagation();
+
+  document
+    .querySelectorAll(".task-dropdown")
+    .forEach(menu => {
+
+      menu.classList.remove("show");
+
+    });
+
+
+  const menu =
+    document.getElementById("menu-" + index);
+
+  if(menu){
+
+    menu.classList.toggle("show");
+
+  }
+
+}
+
+
+document.addEventListener("click",function(){
+
+  document
+    .querySelectorAll(".task-dropdown")
+    .forEach(menu => {
+
+      menu.classList.remove("show");
+
+    });
+
+});
+
+
+/* ================= COMPLETE ================= */
+
+function completeTask(index){
+
+  tasks[index].completed =
+    !tasks[index].completed;
+
+  renderTasks();
+
+}
+
+
+/* ================= EDIT ================= */
+
+function editTask(index){
+
+  const newTitle =
+    prompt(
+      "Edit task title:",
+      tasks[index].title
+    );
+
+
+  if(newTitle === null){
+    return;
+  }
+
+
+  if(newTitle.trim() === ""){
+    return;
+  }
+
+
+  tasks[index].title =
+    newTitle.trim();
+
+  renderTasks();
+
+}
+
+
+/* ================= DELETE CONFIRMATION ================= */
+
+function askDelete(index){
+
+  deleteIndex = index;
+
+  const dialog =
+    document.getElementById("deleteDialog");
+
+  dialog.classList.add("show");
+
+}
+
+
+/* ================= CONFIRM DELETE ================= */
+
+function confirmDelete(){
+
+  if(deleteIndex === null){
+    return;
+  }
+
+
+  tasks.splice(deleteIndex,1);
+
+  deleteIndex = null;
+
+  closeDeleteDialog();
+
+  renderTasks();
+
+}
+
+
+/* ================= CANCEL DELETE ================= */
+
+function closeDeleteDialog(){
+
+  document
+    .getElementById("deleteDialog")
+    .classList.remove("show");
+
+}
+
+
+/* ================= ADD TASK ================= */
 
 function openModal(){
 
@@ -1030,13 +1431,20 @@ function closeModal(){
 function addTask(){
 
   const title =
-    document.getElementById("taskTitle").value.trim();
+    document
+      .getElementById("taskTitle")
+      .value
+      .trim();
 
   const date =
-    document.getElementById("taskDate").value;
+    document
+      .getElementById("taskDate")
+      .value;
 
   const priority =
-    document.getElementById("taskPriority").value;
+    document
+      .getElementById("taskPriority")
+      .value;
 
 
   if(!title){
@@ -1044,6 +1452,7 @@ function addTask(){
     alert("Please enter a task title.");
 
     return;
+
   }
 
 
@@ -1060,11 +1469,19 @@ function addTask(){
   });
 
 
-  document.getElementById("taskTitle").value = "";
+  document
+    .getElementById("taskTitle")
+    .value = "";
 
-  document.getElementById("taskDate").value = "";
 
-  document.getElementById("taskPriority").value = "Medium";
+  document
+    .getElementById("taskDate")
+    .value = "";
+
+
+  document
+    .getElementById("taskPriority")
+    .value = "Medium";
 
 
   closeModal();
@@ -1074,46 +1491,32 @@ function addTask(){
 }
 
 
-function completeTask(index){
-
-  tasks[index].completed =
-    !tasks[index].completed;
-
-  renderTasks();
-
-}
-
-
-function deleteTask(index){
-
-  if(confirm("Delete this task?")){
-
-    tasks.splice(index,1);
-
-    renderTasks();
-
-  }
-
-}
-
+/* ================= LOGOUT ================= */
 
 function logout(){
 
-  window.location.href = "index.html";
+  window.location.href =
+    "index.html";
 
 }
 
 
-document.getElementById("todayDate").textContent =
-  new Date().toLocaleDateString(
-    "en-US",
-    {
-      weekday:"short",
-      month:"short",
-      day:"numeric"
-    }
-  );
+/* ================= DATE ================= */
 
+document
+  .getElementById("todayDate")
+  .textContent =
+    new Date().toLocaleDateString(
+      "en-US",
+      {
+        weekday:"short",
+        month:"short",
+        day:"numeric"
+      }
+    );
+
+
+/* ================= START ================= */
 
 renderTasks();
 
