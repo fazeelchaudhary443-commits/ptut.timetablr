@@ -1073,6 +1073,164 @@ footer{
   }
 
 }
+  /* =========================================
+   PTUT HUB — PREMIUM ANIMATION LAYER
+   Does not change existing design
+   ========================================= */
+
+body{
+  animation:ptutPageIn .7s ease both;
+}
+
+@keyframes ptutPageIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+/* Navbar entrance */
+.navbar{
+  animation:ptutNavIn .7s ease both;
+}
+
+@keyframes ptutNavIn{
+  from{
+    opacity:0;
+    transform:translateY(-20px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* Hero content entrance */
+.hero-content{
+  animation:ptutHeroIn .9s ease .1s both;
+}
+
+@keyframes ptutHeroIn{
+  from{
+    opacity:0;
+    transform:translateY(30px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* Hero dashboard entrance */
+.preview-wrap{
+  animation:ptutPreviewIn 1s ease .2s both;
+}
+
+@keyframes ptutPreviewIn{
+  from{
+    opacity:0;
+    transform:translateY(35px) scale(.97);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+/* Buttons */
+.btn{
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease;
+}
+
+.btn:hover{
+  transform:translateY(-3px);
+}
+
+.btn-primary:hover{
+  box-shadow:0 14px 30px rgba(37,99,235,.25);
+}
+
+/* Feature cards */
+.feature{
+  transition:
+    transform .3s ease,
+    box-shadow .3s ease;
+}
+
+.feature:hover{
+  transform:translateY(-7px);
+  box-shadow:0 18px 38px rgba(15,23,42,.10);
+}
+
+/* Program cards */
+.program{
+  transition:
+    transform .3s ease,
+    box-shadow .3s ease;
+}
+
+.program:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 30px rgba(15,23,42,.08);
+}
+
+/* Dashboard cards */
+.stat,
+.preview-class{
+  transition:
+    transform .3s ease,
+    box-shadow .3s ease;
+}
+
+.stat:hover,
+.preview-class:hover{
+  transform:translateY(-4px);
+  box-shadow:0 12px 25px rgba(15,23,42,.08);
+}
+
+/* Scroll reveal */
+.ptut-reveal{
+  opacity:0;
+  transform:translateY(35px);
+  transition:
+    opacity .8s ease,
+    transform .8s ease;
+}
+
+.ptut-reveal.ptut-visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* Stagger */
+.ptut-reveal:nth-child(1){transition-delay:.05s}
+.ptut-reveal:nth-child(2){transition-delay:.12s}
+.ptut-reveal:nth-child(3){transition-delay:.19s}
+.ptut-reveal:nth-child(4){transition-delay:.26s}
+.ptut-reveal:nth-child(5){transition-delay:.33s}
+.ptut-reveal:nth-child(6){transition-delay:.40s}
+
+/* Mobile: keep animations lightweight */
+@media(max-width:650px){
+
+  .ptut-reveal{
+    transform:translateY(20px);
+  }
+
+}
+
+/* Accessibility */
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+
+}
 </style>
 </head>
 
@@ -2237,6 +2395,63 @@ async function checkSession(){
 checkSession();
 
 </script>
+<script>
+/* =========================================
+   PTUT HUB — SCROLL REVEAL ENGINE
+   ========================================= */
 
+document.addEventListener("DOMContentLoaded", function(){
+
+  const elements = document.querySelectorAll(
+    ".features, .uni-content, .program-list, .cta"
+  );
+
+  elements.forEach(function(element){
+
+    element.classList.add("ptut-reveal");
+
+  });
+
+  const cards = document.querySelectorAll(
+    ".feature, .program"
+  );
+
+  cards.forEach(function(card){
+
+    card.classList.add("ptut-reveal");
+
+  });
+
+  const observer = new IntersectionObserver(
+    function(entries){
+
+      entries.forEach(function(entry){
+
+        if(entry.isIntersecting){
+
+          entry.target.classList.add("ptut-visible");
+
+          observer.unobserve(entry.target);
+
+        }
+
+      });
+
+    },
+    {
+      threshold:0.12
+    }
+  );
+
+  document
+    .querySelectorAll(".ptut-reveal")
+    .forEach(function(element){
+
+      observer.observe(element);
+
+    });
+
+});
+</script>
 </body>
 </html>
