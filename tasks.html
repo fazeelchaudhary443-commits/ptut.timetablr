@@ -1330,12 +1330,11 @@ function renderTasks(){
 
       <div class="task">
 
-        <div
-          class="checkbox"
-          onclick="completeTask(${realIndex})"
-          title="Mark as completed"
-        ></div>
-
+    <div
+  class="checkbox ${task.completed ? "checked" : ""}"
+  onclick="completeTask(${realIndex})"
+  title="Mark as completed"
+></div>
 
         <div class="task-info">
 
