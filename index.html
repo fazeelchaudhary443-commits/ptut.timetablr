@@ -1,957 +1,2241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PTUT Hub</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PTUT Hub — Your Academic Life, Organized</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #0b1220;
-      color: white;
-      min-height: 100vh;
-    }
+html{
+  scroll-behavior:smooth;
+}
 
-    button,
-    input {
-      font: inherit;
-    }
+body{
+  font-family:Inter,Arial,sans-serif;
+  background:#f8fafc;
+  color:#0f172a;
+}
 
-    button {
-      cursor: pointer;
-    }
+button,a{
+  font:inherit;
+}
 
-    /* NAVBAR */
-    nav {
-      height: 75px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 7%;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      background: rgba(11,18,32,.95);
-    }
+a{
+  text-decoration:none;
+}
 
-    .logo {
-      font-size: 24px;
-      font-weight: 800;
-    }
+/* ---------- NAVBAR ---------- */
 
-    .logo span {
-      color: #22d3ee;
-    }
+.navbar{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:100;
+  height:74px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 6%;
+  background:rgba(248,250,252,.88);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(226,232,240,.7);
+}
 
-    .nav-buttons {
-      display: flex;
-      gap: 12px;
-    }
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:21px;
+  font-weight:800;
+  color:#0f172a;
+}
 
-    .btn {
-      border: 0;
-      border-radius: 10px;
-      padding: 11px 20px;
-      font-weight: 700;
-      transition: .2s;
-    }
+.logo-mark{
+  width:38px;
+  height:38px;
+  border-radius:11px;
+  display:grid;
+  place-items:center;
+  color:white;
+  background:#0f172a;
+  font-weight:800;
+}
 
-    .btn:hover {
-      transform: translateY(-2px);
-    }
+.logo span{
+  color:#2563eb;
+}
 
-    .btn-outline {
-      background: transparent;
-      color: white;
-      border: 1px solid rgba(255,255,255,.2);
-    }
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:30px;
+}
 
-    .btn-primary {
-      background: #22d3ee;
-      color: #061018;
-    }
+.nav-links a{
+  color:#64748b;
+  font-size:14px;
+  font-weight:500;
+  transition:.2s;
+}
 
-    /* LANDING */
-    .landing {
-      min-height: calc(100vh - 75px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 20px;
-      text-align: center;
-    }
+.nav-links a:hover{
+  color:#2563eb;
+}
 
-    .hero {
-      max-width: 850px;
-    }
+.nav-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
 
-    .badge {
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 50px;
-      background: rgba(34,211,238,.1);
-      color: #22d3ee;
-      font-size: 14px;
-      margin-bottom: 25px;
-    }
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:11px 17px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.2s;
+}
 
-    h1 {
-      font-size: clamp(42px, 7vw, 78px);
-      line-height: 1;
-      margin-bottom: 25px;
-    }
+.btn:hover{
+  transform:translateY(-1px);
+}
 
-    .hero p {
-      color: #94a3b8;
-      font-size: 19px;
-      line-height: 1.7;
-      max-width: 650px;
-      margin: auto;
-    }
+.btn-light{
+  background:white;
+  border:1px solid #e2e8f0;
+  color:#0f172a;
+}
 
-    .hero-buttons {
-      margin-top: 35px;
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
+.btn-primary{
+  background:#2563eb;
+  color:white;
+  box-shadow:0 8px 20px rgba(37,99,235,.18);
+}
 
-    /* AUTH */
-    .auth-page {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 25px;
-      background:
-        radial-gradient(circle at top, rgba(34,211,238,.12), transparent 40%),
-        #0b1220;
-    }
+/* ---------- HERO ---------- */
 
-    .auth-card {
-      width: 100%;
-      max-width: 440px;
-      background: #111b2e;
-      border: 1px solid rgba(255,255,255,.09);
-      border-radius: 20px;
-      padding: 35px;
-      box-shadow: 0 25px 70px rgba(0,0,0,.35);
-    }
+.hero{
+  min-height:720px;
+  padding:150px 6% 90px;
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  align-items:center;
+  gap:70px;
+  background:
+    radial-gradient(circle at 85% 20%,rgba(37,99,235,.13),transparent 30%),
+    radial-gradient(circle at 10% 80%,rgba(14,165,233,.08),transparent 25%),
+    #f8fafc;
+}
 
-    .back {
-      background: transparent;
-      border: 0;
-      color: #94a3b8;
-      margin-bottom: 25px;
-      font-size: 14px;
-    }
+.hero-content{
+  max-width:650px;
+}
 
-    .auth-card h2 {
-      font-size: 32px;
-      margin-bottom: 8px;
-    }
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 11px;
+  border-radius:30px;
+  background:#eff6ff;
+  color:#2563eb;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:22px;
+}
 
-    .auth-subtitle {
-      color: #94a3b8;
-      margin-bottom: 28px;
-      line-height: 1.5;
-    }
+.dot{
+  width:7px;
+  height:7px;
+  background:#22c55e;
+  border-radius:50%;
+}
 
-    .form-group {
-      margin-bottom: 17px;
-    }
+.hero h1{
+  font-size:clamp(44px,6vw,72px);
+  line-height:1.02;
+  letter-spacing:-3px;
+  margin-bottom:22px;
+}
 
-    label {
-      display: block;
-      margin-bottom: 7px;
-      color: #cbd5e1;
-      font-size: 14px;
-      font-weight: 600;
-    }
+.hero h1 span{
+  color:#2563eb;
+}
 
-    input {
-      width: 100%;
-      padding: 13px 14px;
-      border-radius: 10px;
-      border: 1px solid #26354d;
-      background: #0b1220;
-      color: white;
-      outline: none;
-    }
+.hero-text{
+  max-width:560px;
+  color:#64748b;
+  font-size:18px;
+  line-height:1.7;
+  margin-bottom:30px;
+}
 
-    input:focus {
-      border-color: #22d3ee;
-      box-shadow: 0 0 0 3px rgba(34,211,238,.08);
-    }
+.hero-actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
 
-    .password-wrap {
-      position: relative;
-    }
+.hero-actions .btn{
+  padding:14px 21px;
+}
 
-    .password-wrap input {
-      padding-right: 70px;
-    }
+.hero-note{
+  margin-top:20px;
+  color:#94a3b8;
+  font-size:12px;
+}
 
-    .show-password {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: transparent;
-      border: 0;
-      color: #22d3ee;
-      font-size: 12px;
-    }
+/* ---------- PREVIEW AREA ---------- */
 
-    .auth-submit {
-      width: 100%;
-      margin-top: 8px;
-      padding: 14px;
-      border: 0;
-      border-radius: 10px;
-      background: #22d3ee;
-      color: #061018;
-      font-weight: 800;
-    }
+.preview-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:500px;
+}
 
-    .auth-submit:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
+/* ---------- DESKTOP DASHBOARD ---------- */
 
-    .switch-auth {
-      text-align: center;
-      margin-top: 22px;
-      color: #94a3b8;
-      font-size: 14px;
-    }
+.preview{
+  width:100%;
+  background:white;
+  border:1px solid #e2e8f0;
+  border-radius:22px;
+  padding:14px;
+  box-shadow:
+    0 30px 70px rgba(15,23,42,.12),
+    0 8px 25px rgba(15,23,42,.05);
+  transform:rotate(1.5deg);
+}
 
-    .switch-auth button {
-      background: none;
-      border: 0;
-      color: #22d3ee;
-      font-weight: 700;
-    }
+.preview-top{
+  height:40px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:0 8px;
+}
 
-    .message {
-      display: none;
-      padding: 12px;
-      border-radius: 9px;
-      margin-bottom: 18px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
+.circle{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#cbd5e1;
+}
 
-    .message.error {
-      display: block;
-      background: rgba(239,68,68,.1);
-      color: #fca5a5;
-      border: 1px solid rgba(239,68,68,.2);
-    }
+.preview-body{
+  display:grid;
+  grid-template-columns:105px 1fr;
+  min-height:370px;
+  border:1px solid #eef2f7;
+  border-radius:14px;
+  overflow:hidden;
+}
 
-    .message.success {
-      display: block;
-      background: rgba(34,197,94,.1);
-      color: #86efac;
-      border: 1px solid rgba(34,197,94,.2);
-    }
+.preview-side{
+  background:#0f172a;
+  padding:17px 10px;
+}
 
-    /* SUCCESS */
-    .success-page {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 25px;
-      text-align: center;
-    }
+.preview-side-title{
+  color:white;
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:22px;
+}
 
-    .success-card {
-      max-width: 500px;
-      background: #111b2e;
-      border: 1px solid rgba(255,255,255,.08);
-      padding: 45px 30px;
-      border-radius: 20px;
-    }
+.side-item{
+  color:#94a3b8;
+  font-size:9px;
+  padding:8px;
+  border-radius:6px;
+  margin-bottom:4px;
+}
 
-    .success-icon {
-      font-size: 55px;
-      margin-bottom: 20px;
-    }
+.side-item.active{
+  background:#1e293b;
+  color:white;
+}
 
-    .success-card h2 {
-      margin-bottom: 12px;
-    }
+.preview-main{
+  padding:20px;
+  background:#f8fafc;
+}
 
-    .success-card p {
-      color: #94a3b8;
-      line-height: 1.6;
-      margin-bottom: 25px;
-    }
+.preview-welcome{
+  background:#0f172a;
+  color:white;
+  padding:17px;
+  border-radius:12px;
+  margin-bottom:12px;
+}
 
-    @media(max-width:600px) {
-      nav {
-        padding: 0 20px;
-      }
+.preview-welcome strong{
+  display:block;
+  font-size:14px;
+  margin-bottom:5px;
+}
 
-      .nav-buttons .btn-outline {
-        display: none;
-      }
+.preview-welcome small{
+  color:#94a3b8;
+  font-size:9px;
+}
 
-      .auth-card {
-        padding: 25px 20px;
-      }
-    }
-  </style>
+.preview-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.stat{
+  background:white;
+  border:1px solid #e2e8f0;
+  border-radius:9px;
+  padding:12px;
+}
+
+.stat small{
+  color:#94a3b8;
+  font-size:8px;
+}
+
+.stat strong{
+  display:block;
+  font-size:17px;
+  margin-top:5px;
+}
+
+.preview-class{
+  background:white;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  padding:13px;
+}
+
+.preview-class h4{
+  font-size:11px;
+  margin-bottom:9px;
+}
+
+.class-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:9px 0;
+  border-bottom:1px solid #f1f5f9;
+}
+
+.class-row:last-child{
+  border-bottom:0;
+}
+
+.class-name{
+  font-size:9px;
+  font-weight:700;
+}
+
+.class-info{
+  font-size:8px;
+  color:#94a3b8;
+  margin-top:3px;
+}
+
+.badge{
+  padding:4px 6px;
+  border-radius:5px;
+  background:#eff6ff;
+  color:#2563eb;
+  font-size:7px;
+  font-weight:700;
+}
+
+/* ---------- PHONE SLIDE ---------- */
+
+.phone-slide{
+  position:absolute;
+  right:-42px;
+  bottom:-38px;
+  width:190px;
+  z-index:5;
+  animation:phoneFloat 4s ease-in-out infinite;
+}
+
+@keyframes phoneFloat{
+  0%,100%{
+    transform:translateY(0) rotate(3deg);
+  }
+  50%{
+    transform:translateY(-12px) rotate(1deg);
+  }
+}
+
+.phone{
+  position:relative;
+  background:#0b1220;
+  border:7px solid #0b1220;
+  border-radius:30px;
+  padding:0;
+  box-shadow:
+    0 25px 55px rgba(15,23,42,.28),
+    0 8px 20px rgba(15,23,42,.15);
+  overflow:hidden;
+}
+
+.phone-notch{
+  position:absolute;
+  top:7px;
+  left:50%;
+  transform:translateX(-50%);
+  width:72px;
+  height:19px;
+  border-radius:0 0 14px 14px;
+  background:#0b1220;
+  z-index:4;
+}
+
+.phone-screen{
+  background:#f8fafc;
+  min-height:365px;
+  overflow:hidden;
+}
+
+/* phone status bar */
+
+.phone-status{
+  height:32px;
+  padding:8px 13px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  font-size:8px;
+  font-weight:700;
+  color:#0f172a;
+}
+
+/* phone dashboard */
+
+.mobile-dashboard{
+  padding:8px 12px 18px;
+}
+
+.mobile-brand{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:13px;
+}
+
+.mobile-brand-name{
+  font-size:12px;
+  font-weight:800;
+}
+
+.mobile-avatar{
+  width:25px;
+  height:25px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#2563eb;
+  color:white;
+  font-size:8px;
+  font-weight:800;
+}
+
+/* greeting */
+
+.mobile-greeting{
+  background:#0f172a;
+  border-radius:15px;
+  padding:15px 13px;
+  color:white;
+  margin-bottom:11px;
+  position:relative;
+  overflow:hidden;
+}
+
+.mobile-greeting:after{
+  content:"";
+  position:absolute;
+  width:80px;
+  height:80px;
+  right:-25px;
+  top:-30px;
+  background:rgba(37,99,235,.35);
+  border-radius:50%;
+}
+
+.mobile-greeting small{
+  color:#94a3b8;
+  font-size:7px;
+  display:block;
+  margin-bottom:4px;
+}
+
+.mobile-greeting strong{
+  display:block;
+  font-size:12px;
+  position:relative;
+  z-index:2;
+}
+
+/* clock */
+
+.mobile-time-card{
+  background:white;
+  border:1px solid #e2e8f0;
+  border-radius:13px;
+  padding:11px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.mobile-time-label{
+  color:#94a3b8;
+  font-size:7px;
+}
+
+.mobile-time{
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:-1px;
+}
+
+.mobile-date{
+  color:#2563eb;
+  font-size:7px;
+  font-weight:700;
+}
+
+/* mini stats */
+
+.mobile-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+  margin-bottom:10px;
+}
+
+.mobile-stat{
+  background:white;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  padding:9px 7px;
+}
+
+.mobile-stat span{
+  display:block;
+  color:#94a3b8;
+  font-size:6px;
+}
+
+.mobile-stat strong{
+  display:block;
+  font-size:13px;
+  margin-top:3px;
+}
+
+/* classes */
+
+.mobile-section-title{
+  font-size:9px;
+  font-weight:800;
+  margin-bottom:7px;
+}
+
+.mobile-class{
+  background:white;
+  border:1px solid #e2e8f0;
+  border-radius:11px;
+  padding:9px;
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.mobile-class-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.mobile-class-icon{
+  width:25px;
+  height:25px;
+  border-radius:7px;
+  background:#eff6ff;
+  color:#2563eb;
+  display:grid;
+  place-items:center;
+  font-size:9px;
+  font-weight:800;
+}
+
+.mobile-class-name{
+  font-size:8px;
+  font-weight:800;
+}
+
+.mobile-class-info{
+  color:#94a3b8;
+  font-size:6px;
+  margin-top:2px;
+}
+
+.mobile-class-time{
+  font-size:7px;
+  font-weight:800;
+  color:#2563eb;
+}
+
+/* ---------- FEATURES ---------- */
+
+.features{
+  padding:100px 6%;
+  background:white;
+}
+
+.section-heading{
+  max-width:620px;
+  margin:0 auto 50px;
+  text-align:center;
+}
+
+.section-heading small{
+  color:#2563eb;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.section-heading h2{
+  font-size:38px;
+  letter-spacing:-1.5px;
+  margin:10px 0 13px;
+}
+
+.section-heading p{
+  color:#64748b;
+  line-height:1.7;
+}
+
+.feature-grid{
+  max-width:1150px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+
+.feature{
+  padding:25px;
+  border:1px solid #e2e8f0;
+  border-radius:16px;
+  background:#fff;
+  transition:.25s;
+}
+
+.feature:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 35px rgba(15,23,42,.07);
+}
+
+.icon{
+  width:43px;
+  height:43px;
+  display:grid;
+  place-items:center;
+  border-radius:11px;
+  background:#eff6ff;
+  color:#2563eb;
+  font-size:20px;
+  margin-bottom:17px;
+}
+
+.feature h3{
+  font-size:16px;
+  margin-bottom:8px;
+}
+
+.feature p{
+  color:#64748b;
+  font-size:13px;
+  line-height:1.65;
+}
+
+/* ---------- UNIVERSITY ---------- */
+
+.university{
+  padding:100px 6%;
+  background:#f8fafc;
+}
+
+.uni-grid{
+  max-width:1100px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:50px;
+  align-items:center;
+}
+
+.uni-content h2{
+  font-size:38px;
+  letter-spacing:-1.5px;
+  margin:10px 0 16px;
+}
+
+.uni-content p{
+  color:#64748b;
+  line-height:1.75;
+  margin-bottom:20px;
+}
+
+.program-list{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.program{
+  background:white;
+  border:1px solid #e2e8f0;
+  padding:11px 13px;
+  border-radius:9px;
+  font-size:12px;
+  font-weight:600;
+}
+
+/* ---------- CTA ---------- */
+
+.cta{
+  padding:100px 6%;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
+
+.cta h2{
+  font-size:42px;
+  letter-spacing:-1.5px;
+  margin-bottom:13px;
+}
+
+.cta p{
+  color:#94a3b8;
+  margin-bottom:25px;
+}
+
+.cta .btn{
+  padding:14px 23px;
+}
+
+/* ---------- FOOTER ---------- */
+
+footer{
+  background:#0f172a;
+  border-top:1px solid #1e293b;
+  padding:25px 6%;
+  color:#64748b;
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+}
+
+/* ---------- AUTH MODAL ---------- */
+
+.auth-overlay{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(15,23,42,.55);
+  backdrop-filter:blur(12px);
+}
+
+.auth-overlay.show{
+  display:flex;
+}
+
+.auth-card{
+  width:100%;
+  max-width:430px;
+  background:white;
+  border-radius:22px;
+  padding:32px;
+  box-shadow:0 30px 80px rgba(15,23,42,.25);
+  position:relative;
+  animation:authIn .25s ease;
+}
+
+@keyframes authIn{
+  from{
+    opacity:0;
+    transform:translateY(15px) scale(.98);
+  }
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
+
+.auth-close{
+  position:absolute;
+  right:18px;
+  top:15px;
+  width:32px;
+  height:32px;
+  border:0;
+  border-radius:50%;
+  background:#f1f5f9;
+  cursor:pointer;
+  font-size:17px;
+}
+
+.auth-logo{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:19px;
+  font-weight:800;
+  margin-bottom:22px;
+}
+
+.auth-logo-mark{
+  width:34px;
+  height:34px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  background:#0f172a;
+  color:white;
+}
+
+.auth-logo span{
+  color:#2563eb;
+}
+
+.auth-card h2{
+  font-size:26px;
+  letter-spacing:-.8px;
+  margin-bottom:7px;
+}
+
+.auth-subtitle{
+  color:#64748b;
+  font-size:13px;
+  margin-bottom:22px;
+  line-height:1.5;
+}
+
+.auth-form{
+  display:flex;
+  flex-direction:column;
+  gap:13px;
+}
+
+.auth-label{
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:5px;
+  display:block;
+}
+
+.auth-input-wrap{
+  position:relative;
+}
+
+.auth-input{
+  width:100%;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  padding:12px 13px;
+  outline:none;
+  font-size:13px;
+  transition:.2s;
+}
+
+.auth-input:focus{
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.08);
+}
+
+.password-toggle{
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  border:0;
+  background:none;
+  cursor:pointer;
+  color:#64748b;
+  font-size:11px;
+  font-weight:600;
+}
+
+.auth-submit{
+  width:100%;
+  margin-top:4px;
+  padding:13px;
+  border:0;
+  border-radius:10px;
+  background:#2563eb;
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.auth-submit:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.auth-switch{
+  margin-top:18px;
+  text-align:center;
+  color:#64748b;
+  font-size:12px;
+}
+
+.auth-switch button{
+  border:0;
+  background:none;
+  color:#2563eb;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.auth-message{
+  display:none;
+  padding:10px 12px;
+  border-radius:9px;
+  font-size:12px;
+  line-height:1.5;
+  margin-bottom:12px;
+}
+
+.auth-message.show{
+  display:block;
+}
+
+.auth-message.error{
+  background:#fef2f2;
+  color:#b91c1c;
+  border:1px solid #fecaca;
+}
+
+.auth-message.success{
+  background:#f0fdf4;
+  color:#15803d;
+  border:1px solid #bbf7d0;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media(max-width:1100px){
+
+  .phone-slide{
+    right:-15px;
+    bottom:-30px;
+    width:165px;
+  }
+
+}
+
+@media(max-width:1000px){
+
+  .nav-links{
+    display:none;
+  }
+
+  .hero{
+    grid-template-columns:1fr;
+    padding-top:125px;
+  }
+
+  .hero-content{
+    max-width:700px;
+  }
+
+  .feature-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .uni-grid{
+    grid-template-columns:1fr;
+  }
+
+  .preview-wrap{
+    padding-right:40px;
+  }
+
+}
+
+@media(max-width:650px){
+
+  .navbar{
+    padding:0 18px;
+  }
+
+  .logo{
+    font-size:18px;
+  }
+
+  .nav-actions .btn-light{
+    display:none;
+  }
+
+  .hero{
+    padding:120px 20px 70px;
+    gap:40px;
+  }
+
+  .hero h1{
+    letter-spacing:-2px;
+  }
+
+  .hero-text{
+    font-size:16px;
+  }
+
+  .preview{
+    transform:none;
+  }
+
+  .preview-body{
+    grid-template-columns:80px 1fr;
+  }
+
+  .phone-slide{
+    position:relative;
+    right:auto;
+    bottom:auto;
+    width:175px;
+    margin:-70px auto 0;
+  }
+
+  .preview-wrap{
+    padding-right:0;
+    flex-direction:column;
+  }
+
+  .feature-grid{
+    grid-template-columns:1fr;
+  }
+
+  .features,
+  .university,
+  .cta{
+    padding:70px 20px;
+  }
+
+  .section-heading h2,
+  .uni-content h2{
+    font-size:30px;
+  }
+
+  .program-list{
+    grid-template-columns:1fr;
+  }
+
+  .cta h2{
+    font-size:31px;
+  }
+
+  footer{
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .auth-card{
+    padding:25px 20px;
+  }
+
+}
+</style>
 </head>
 
 <body>
 
-  <div id="app"></div>
+<!-- NAVBAR -->
+<header class="navbar">
 
-  <script>
+  <a href="#" class="logo">
+    <div class="logo-mark">P</div>
+    PTUT <span>Hub</span>
+  </a>
 
-    /* =========================================
-       SUPABASE
-    ========================================= */
+  <nav class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#programs">Programs</a>
+    <a href="#about">About</a>
+  </nav>
 
-    const SUPABASE_URL =
-      "https://owiakeoybapbrfrmhcik.supabase.co";
+  <div class="nav-actions">
+    <button class="btn btn-light" onclick="login()">Log in</button>
+    <button class="btn btn-primary" onclick="signup()">Get Started</button>
+  </div>
 
-    const SUPABASE_KEY =
-      "sb_publishable_KxTVXqabaSm4BXRzqtUAeA_FHt8MPf-";
+</header>
 
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
+
+<!-- HERO -->
+<section class="hero">
+
+  <div class="hero-content">
+
+    <div class="eyebrow">
+      <span class="dot"></span>
+      Built for PTUT students
+    </div>
+
+    <h1>
+      Your academic life,
+      <span>organized.</span>
+    </h1>
+
+    <p class="hero-text">
+      PTUT Hub brings your timetable, tasks, exams and university
+      announcements together in one simple student platform.
+    </p>
+
+    <div class="hero-actions">
+
+      <button class="btn btn-primary" onclick="signup()">
+        Get started →
+      </button>
+
+      <button class="btn btn-light" onclick="login()">
+        Log in
+      </button>
+
+    </div>
+
+    <p class="hero-note">
+      Punjab Tianjin University of Technology · Lahore
+    </p>
+
+  </div>
+
+
+  <!-- APP PREVIEW -->
+  <div class="preview-wrap">
+
+    <!-- DESKTOP DASHBOARD -->
+    <div class="preview">
+
+      <div class="preview-top">
+        <span class="circle"></span>
+        <span class="circle"></span>
+        <span class="circle"></span>
+      </div>
+
+      <div class="preview-body">
+
+        <aside class="preview-side">
+
+          <div class="preview-side-title">
+            PTUT Hub
+          </div>
+
+          <div class="side-item active">Dashboard</div>
+          <div class="side-item">Timetable</div>
+          <div class="side-item">Tasks</div>
+          <div class="side-item">Exams</div>
+          <div class="side-item">Announcements</div>
+          <div class="side-item">Settings</div>
+
+        </aside>
+
+        <div class="preview-main">
+
+          <div class="preview-welcome">
+            <strong>Good morning, Fazeel 👋</strong>
+            <small>Here's what's happening today.</small>
+          </div>
+
+          <div class="preview-stats">
+
+            <div class="stat">
+              <small>Classes</small>
+              <strong>4</strong>
+            </div>
+
+            <div class="stat">
+              <small>Tasks</small>
+              <strong>6</strong>
+            </div>
+
+            <div class="stat">
+              <small>Exams</small>
+              <strong>2</strong>
+            </div>
+
+          </div>
+
+          <div class="preview-class">
+
+            <h4>Today's Classes</h4>
+
+            <div class="class-row">
+              <div>
+                <div class="class-name">OOP</div>
+                <div class="class-info">09:00 AM · Room 204</div>
+              </div>
+              <span class="badge">Upcoming</span>
+            </div>
+
+            <div class="class-row">
+              <div>
+                <div class="class-name">Database Systems</div>
+                <div class="class-info">11:00 AM · Lab 2</div>
+              </div>
+              <span class="badge">11:00</span>
+            </div>
+
+            <div class="class-row">
+              <div>
+                <div class="class-name">ICT</div>
+                <div class="class-info">01:00 PM · Room 108</div>
+              </div>
+              <span class="badge">01:00</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- PHONE DASHBOARD SLIDE -->
+    <div class="phone-slide">
+
+      <div class="phone">
+
+        <div class="phone-notch"></div>
+
+        <div class="phone-screen">
+
+          <div class="phone-status">
+            <span>9:45</span>
+            <span>● ● ▰</span>
+          </div>
+
+          <div class="mobile-dashboard">
+
+            <div class="mobile-brand">
+
+              <div class="mobile-brand-name">
+                PTUT Hub
+              </div>
+
+              <div class="mobile-avatar">
+                F
+              </div>
+
+            </div>
+
+
+            <div class="mobile-greeting">
+
+              <small>GOOD MORNING</small>
+
+              <strong>
+                Hi, Fazeel 👋
+              </strong>
+
+            </div>
+
+
+            <div class="mobile-time-card">
+
+              <div>
+                <div class="mobile-time-label">
+                  Current time
+                </div>
+
+                <div class="mobile-time">
+                  9:45
+                </div>
+              </div>
+
+              <div class="mobile-date">
+                TODAY
+              </div>
+
+            </div>
+
+
+            <div class="mobile-stats">
+
+              <div class="mobile-stat">
+                <span>Classes</span>
+                <strong>4</strong>
+              </div>
+
+              <div class="mobile-stat">
+                <span>Tasks</span>
+                <strong>6</strong>
+              </div>
+
+              <div class="mobile-stat">
+                <span>Exams</span>
+                <strong>2</strong>
+              </div>
+
+            </div>
+
+
+            <div class="mobile-section-title">
+              Upcoming
+            </div>
+
+
+            <div class="mobile-class">
+
+              <div class="mobile-class-left">
+
+                <div class="mobile-class-icon">
+                  OOP
+                </div>
+
+                <div>
+                  <div class="mobile-class-name">
+                    Object Oriented Programming
+                  </div>
+
+                  <div class="mobile-class-info">
+                    Room 204 · Today
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="mobile-class-time">
+                10:00
+              </div>
+
+            </div>
+
+
+            <div class="mobile-class">
+
+              <div class="mobile-class-left">
+
+                <div class="mobile-class-icon">
+                  DB
+                </div>
+
+                <div>
+                  <div class="mobile-class-name">
+                    Database Systems
+                  </div>
+
+                  <div class="mobile-class-info">
+                    Lab 2 · Today
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="mobile-class-time">
+                11:00
+              </div>
+
+            </div>
+
+
+            <div class="mobile-class">
+
+              <div class="mobile-class-left">
+
+                <div class="mobile-class-icon">
+                  ✓
+                </div>
+
+                <div>
+                  <div class="mobile-class-name">
+                    Assignment Due
+                  </div>
+
+                  <div class="mobile-class-info">
+                    Programming Lab
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="mobile-class-time">
+                2d
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- FEATURES -->
+<section class="features" id="features">
+
+  <div class="section-heading">
+
+    <small>Everything in one place</small>
+
+    <h2>
+      Built around your student life.
+    </h2>
+
+    <p>
+      Stop checking different groups and notes for basic university
+      information. PTUT Hub keeps everything organized.
+    </p>
+
+  </div>
+
+
+  <div class="feature-grid">
+
+    <div class="feature">
+
+      <div class="icon">▦</div>
+
+      <h3>
+        Smart Timetable
+      </h3>
+
+      <p>
+        See your daily and weekly classes, teachers, rooms and timings
+        in one clean view.
+      </p>
+
+    </div>
+
+
+    <div class="feature">
+
+      <div class="icon">✓</div>
+
+      <h3>
+        Tasks
+      </h3>
+
+      <p>
+        Keep assignments, lab work and personal study tasks organized
+        with priorities and deadlines.
+      </p>
+
+    </div>
+
+
+    <div class="feature">
+
+      <div class="icon">◷</div>
+
+      <h3>
+        Exams
+      </h3>
+
+      <p>
+        Keep upcoming exams and preparation progress visible so you
+        know what's coming next.
+      </p>
+
+    </div>
+
+
+    <div class="feature">
+
+      <div class="icon">◉</div>
+
+      <h3>
+        Announcements
+      </h3>
+
+      <p>
+        Receive university, department, semester and section updates
+        in one central place.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- PROGRAMS -->
+<section class="university" id="programs">
+
+  <div class="uni-grid">
+
+    <div class="uni-content">
+
+      <small style="color:#2563eb;font-weight:800;letter-spacing:1px;">
+        PTUT
+      </small>
+
+      <h2>
+        Designed for the PTUT community.
+      </h2>
+
+      <p>
+        PTUT Hub is structured around the university's academic
+        hierarchy — departments, programs, semesters and sections —
+        so students receive information relevant to them.
+      </p>
+
+      <p>
+        From Engineering Technology to Business and Design,
+        the platform is designed to grow with the university.
+      </p>
+
+    </div>
+
+
+    <div class="program-list">
+
+      <div class="program">
+        Architectural Engineering Technology
+      </div>
+
+      <div class="program">
+        Automotive Engineering Technology
+      </div>
+
+      <div class="program">
+        Civil Engineering Technology
+      </div>
+
+      <div class="program">
+        Mechanical Engineering Technology
+      </div>
+
+      <div class="program">
+        Electrical Engineering Technology
+      </div>
+
+      <div class="program">
+        Software Engineering Technology
+      </div>
+
+      <div class="program">
+        Artificial Intelligence Engineering
+      </div>
+
+      <div class="program">
+        Information Security Engineering
+      </div>
+
+      <div class="program">
+        Garments Engineering Technology
+      </div>
+
+      <div class="program">
+        Fashion Design Technology
+      </div>
+
+      <div class="program">
+        Business & Information Technology
+      </div>
+
+      <div class="program">
+        Printing & Graphics Engineering
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ABOUT -->
+<section class="features" id="about">
+
+  <div class="section-heading">
+
+    <small>
+      About PTUT Hub
+    </small>
+
+    <h2>
+      One platform. Less confusion.
+    </h2>
+
+    <p>
+      PTUT Hub is a student-focused digital platform designed to make
+      everyday university information easier to access, understand
+      and manage.
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- CTA -->
+<section class="cta">
+
+  <h2>
+    Ready to organize your university life?
+  </h2>
+
+  <p>
+    Create your PTUT Hub account and get started.
+  </p>
+
+  <button class="btn btn-primary" onclick="signup()">
+    Create your account →
+  </button>
+
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+
+  <span>
+    © 2026 PTUT Hub
+  </span>
+
+  <span>
+    Punjab Tianjin University of Technology · Lahore
+  </span>
+
+</footer>
+
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay">
+
+  <div class="auth-card">
+
+    <button class="auth-close" onclick="closeAuth()">
+      ×
+    </button>
+
+    <div class="auth-logo">
+
+      <div class="auth-logo-mark">
+        P
+      </div>
+
+      PTUT <span>Hub</span>
+
+    </div>
+
+
+    <!-- LOGIN -->
+
+    <div id="loginView">
+
+      <h2>
+        Welcome back
+      </h2>
+
+      <p class="auth-subtitle">
+        Log in to continue to your PTUT Hub account.
+      </p>
+
+      <div class="auth-message" id="loginMessage"></div>
+
+      <form class="auth-form" onsubmit="handleLogin(event)">
+
+        <div>
+
+          <label class="auth-label">
+            Email
+          </label>
+
+          <input
+            class="auth-input"
+            id="loginEmail"
+            type="email"
+            placeholder="you@example.com"
+            required
+          >
+
+        </div>
+
+
+        <div>
+
+          <label class="auth-label">
+            Password
+          </label>
+
+          <div class="auth-input-wrap">
+
+            <input
+              class="auth-input"
+              id="loginPassword"
+              type="password"
+              placeholder="Enter your password"
+              required
+            >
+
+            <button
+              type="button"
+              class="password-toggle"
+              onclick="togglePassword('loginPassword',this)"
+            >
+              Show
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <button
+          class="auth-submit"
+          id="loginSubmit"
+          type="submit"
+        >
+          Log in
+        </button>
+
+      </form>
+
+
+      <div class="auth-switch">
+
+        Don't have an account?
+
+        <button onclick="showSignup()">
+          Create one
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- SIGNUP -->
+
+    <div id="signupView" style="display:none;">
+
+      <h2>
+        Create your account
+      </h2>
+
+      <p class="auth-subtitle">
+        Join PTUT Hub and organize your university life.
+      </p>
+
+      <div class="auth-message" id="signupMessage"></div>
+
+      <form class="auth-form" onsubmit="handleSignup(event)">
+
+        <div>
+
+          <label class="auth-label">
+            Full name
+          </label>
+
+          <input
+            class="auth-input"
+            id="signupName"
+            type="text"
+            placeholder="Fazeel Chaudhary"
+            required
+          >
+
+        </div>
+
+
+        <div>
+
+          <label class="auth-label">
+            Email
+          </label>
+
+          <input
+            class="auth-input"
+            id="signupEmail"
+            type="email"
+            placeholder="you@example.com"
+            required
+          >
+
+        </div>
+
+
+        <div>
+
+          <label class="auth-label">
+            Password
+          </label>
+
+          <div class="auth-input-wrap">
+
+            <input
+              class="auth-input"
+              id="signupPassword"
+              type="password"
+              placeholder="At least 6 characters"
+              minlength="6"
+              required
+            >
+
+            <button
+              type="button"
+              class="password-toggle"
+              onclick="togglePassword('signupPassword',this)"
+            >
+              Show
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <label class="auth-label">
+            Confirm password
+          </label>
+
+          <input
+            class="auth-input"
+            id="signupConfirm"
+            type="password"
+            placeholder="Repeat your password"
+            minlength="6"
+            required
+          >
+
+        </div>
+
+
+        <button
+          class="auth-submit"
+          id="signupSubmit"
+          type="submit"
+        >
+          Create account
+        </button>
+
+      </form>
+
+
+      <div class="auth-switch">
+
+        Already have an account?
+
+        <button onclick="showLogin()">
+          Log in
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+/* =========================================================
+   SUPABASE INITIALIZATION
+========================================================= */
+
+const SUPABASE_URL =
+  "https://owiakeoybapbrfrmhcik.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_KxTVXqabaSm4BXRzqtUAeA_FHt8MPf-";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* =========================================================
+   AUTH UI
+========================================================= */
+
+const authOverlay =
+  document.getElementById("authOverlay");
+
+const loginView =
+  document.getElementById("loginView");
+
+const signupView =
+  document.getElementById("signupView");
+
+
+function login(){
+
+  authOverlay.classList.add("show");
+
+  showLogin();
+
+}
+
+
+function signup(){
+
+  authOverlay.classList.add("show");
+
+  showSignup();
+
+}
+
+
+function closeAuth(){
+
+  authOverlay.classList.remove("show");
+
+}
+
+
+function showLogin(){
+
+  loginView.style.display = "block";
+
+  signupView.style.display = "none";
+
+  clearMessages();
+
+}
+
+
+function showSignup(){
+
+  loginView.style.display = "none";
+
+  signupView.style.display = "block";
+
+  clearMessages();
+
+}
+
+
+function clearMessages(){
+
+  document
+    .getElementById("loginMessage")
+    .className = "auth-message";
+
+  document
+    .getElementById("loginMessage")
+    .textContent = "";
+
+  document
+    .getElementById("signupMessage")
+    .className = "auth-message";
+
+  document
+    .getElementById("signupMessage")
+    .textContent = "";
+
+}
+
+
+function showMessage(id,text,type){
+
+  const box =
+    document.getElementById(id);
+
+  box.textContent = text;
+
+  box.className =
+    "auth-message show " + type;
+
+}
+
+
+function togglePassword(id,button){
+
+  const input =
+    document.getElementById(id);
+
+  if(input.type === "password"){
+
+    input.type = "text";
+
+    button.textContent = "Hide";
+
+  }else{
+
+    input.type = "password";
+
+    button.textContent = "Show";
+
+  }
+
+}
+
+
+/* =========================================================
+   SIGNUP
+========================================================= */
+
+async function handleSignup(event){
+
+  event.preventDefault();
+
+  const name =
+    document.getElementById("signupName")
+      .value.trim();
+
+  const email =
+    document.getElementById("signupEmail")
+      .value.trim();
+
+  const password =
+    document.getElementById("signupPassword")
+      .value;
+
+  const confirm =
+    document.getElementById("signupConfirm")
+      .value;
+
+  const button =
+    document.getElementById("signupSubmit");
+
+
+  if(password !== confirm){
+
+    showMessage(
+      "signupMessage",
+      "Passwords do not match.",
+      "error"
     );
 
+    return;
 
-    /* =========================================
-       APP
-    ========================================= */
+  }
 
-    const app = document.getElementById("app");
 
+  if(password.length < 6){
 
-    function landingPage() {
+    showMessage(
+      "signupMessage",
+      "Password must be at least 6 characters.",
+      "error"
+    );
 
-      app.innerHTML = `
+    return;
 
-        <nav>
-          <div class="logo">
-            PTUT <span>Hub</span>
-          </div>
+  }
 
-          <div class="nav-buttons">
-            <button class="btn btn-outline" onclick="showLogin()">
-              Login
-            </button>
 
-            <button class="btn btn-primary" onclick="showSignup()">
-              Get Started
-            </button>
-          </div>
-        </nav>
+  button.disabled = true;
 
-        <main class="landing">
+  button.textContent =
+    "Creating account...";
 
-          <section class="hero">
 
-            <div class="badge">
-              🎓 Built for PTUT Students
-            </div>
+  const { data, error } =
+    await supabaseClient.auth.signUp({
 
-            <h1>
-              Your academic life,
-              <br>
-              <span style="color:#22d3ee;">organized.</span>
-            </h1>
+      email: email,
 
-            <p>
-              PTUT Hub brings your timetable, tasks, exams
-              and university announcements together in one
-              simple student platform.
-            </p>
+      password: password,
 
-            <div class="hero-buttons">
+      options: {
 
-              <button class="btn btn-primary"
-                      onclick="showSignup()">
-                Create Account →
-              </button>
-
-              <button class="btn btn-outline"
-                      onclick="showLogin()">
-                Login
-              </button>
-
-            </div>
-
-          </section>
-
-        </main>
-      `;
-    }
-
-
-    /* =========================================
-       LOGIN
-    ========================================= */
-
-    function showLogin() {
-
-      app.innerHTML = `
-
-        <div class="auth-page">
-
-          <div class="auth-card">
-
-            <button class="back" onclick="landingPage()">
-              ← Back to PTUT Hub
-            </button>
-
-            <h2>Welcome back 👋</h2>
-
-            <p class="auth-subtitle">
-              Login to your PTUT Hub account.
-            </p>
-
-            <div id="message" class="message"></div>
-
-            <form id="loginForm">
-
-              <div class="form-group">
-
-                <label>Email</label>
-
-                <input
-                  id="loginEmail"
-                  type="email"
-                  placeholder="your@email.com"
-                  required
-                >
-
-              </div>
-
-
-              <div class="form-group">
-
-                <label>Password</label>
-
-                <div class="password-wrap">
-
-                  <input
-                    id="loginPassword"
-                    type="password"
-                    placeholder="Enter your password"
-                    required
-                  >
-
-                  <button
-                    type="button"
-                    class="show-password"
-                    onclick="togglePassword('loginPassword', this)">
-                    Show
-                  </button>
-
-                </div>
-
-              </div>
-
-
-              <button
-                id="loginButton"
-                class="auth-submit"
-                type="submit">
-
-                Login
-
-              </button>
-
-            </form>
-
-
-            <div class="switch-auth">
-
-              Don't have an account?
-
-              <button onclick="showSignup()">
-                Create one
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-      `;
-
-
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", loginUser);
-    }
-
-
-    async function loginUser(e) {
-
-      e.preventDefault();
-
-      const email =
-        document.getElementById("loginEmail").value.trim();
-
-      const password =
-        document.getElementById("loginPassword").value;
-
-      const button =
-        document.getElementById("loginButton");
-
-      button.disabled = true;
-      button.textContent = "Logging in...";
-
-      clearMessage();
-
-      const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-
-
-      if (error) {
-
-        showMessage(
-          getFriendlyError(error.message),
-          "error"
-        );
-
-        button.disabled = false;
-        button.textContent = "Login";
-
-        return;
-      }
-
-
-      if (data.user) {
-
-        showSuccess(
-          "Login successful! 🎉",
-          "Your PTUT Hub account is ready. Dashboard will be connected next."
-        );
-
-      }
-
-    }
-
-
-    /* =========================================
-       SIGNUP
-    ========================================= */
-
-    function showSignup() {
-
-      app.innerHTML = `
-
-        <div class="auth-page">
-
-          <div class="auth-card">
-
-            <button class="back" onclick="landingPage()">
-              ← Back to PTUT Hub
-            </button>
-
-            <h2>Create account 🚀</h2>
-
-            <p class="auth-subtitle">
-              Join PTUT Hub and organize your university life.
-            </p>
-
-            <div id="message" class="message"></div>
-
-            <form id="signupForm">
-
-
-              <div class="form-group">
-
-                <label>Full Name</label>
-
-                <input
-                  id="signupName"
-                  type="text"
-                  placeholder="Your full name"
-                  required
-                >
-
-              </div>
-
-
-              <div class="form-group">
-
-                <label>Email</label>
-
-                <input
-                  id="signupEmail"
-                  type="email"
-                  placeholder="your@email.com"
-                  required
-                >
-
-              </div>
-
-
-              <div class="form-group">
-
-                <label>Password</label>
-
-                <div class="password-wrap">
-
-                  <input
-                    id="signupPassword"
-                    type="password"
-                    placeholder="Minimum 8 characters"
-                    required
-                  >
-
-                  <button
-                    type="button"
-                    class="show-password"
-                    onclick="togglePassword('signupPassword', this)">
-                    Show
-                  </button>
-
-                </div>
-
-              </div>
-
-
-              <div class="form-group">
-
-                <label>Confirm Password</label>
-
-                <div class="password-wrap">
-
-                  <input
-                    id="signupConfirm"
-                    type="password"
-                    placeholder="Repeat your password"
-                    required
-                  >
-
-                  <button
-                    type="button"
-                    class="show-password"
-                    onclick="togglePassword('signupConfirm', this)">
-                    Show
-                  </button>
-
-                </div>
-
-              </div>
-
-
-              <button
-                id="signupButton"
-                class="auth-submit"
-                type="submit">
-
-                Create Account
-
-              </button>
-
-            </form>
-
-
-            <div class="switch-auth">
-
-              Already have an account?
-
-              <button onclick="showLogin()">
-                Login
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-      `;
-
-
-      document
-        .getElementById("signupForm")
-        .addEventListener("submit", signupUser);
-    }
-
-
-    async function signupUser(e) {
-
-      e.preventDefault();
-
-      const name =
-        document.getElementById("signupName").value.trim();
-
-      const email =
-        document.getElementById("signupEmail").value.trim();
-
-      const password =
-        document.getElementById("signupPassword").value;
-
-      const confirm =
-        document.getElementById("signupConfirm").value;
-
-      const button =
-        document.getElementById("signupButton");
-
-
-      clearMessage();
-
-
-      /* VALIDATION */
-
-      if (name.length < 2) {
-
-        showMessage(
-          "Please enter your full name.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      if (password.length < 8) {
-
-        showMessage(
-          "Password must be at least 8 characters.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      if (password !== confirm) {
-
-        showMessage(
-          "Passwords do not match.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      button.disabled = true;
-      button.textContent = "Creating account...";
-
-
-      /* SUPABASE SIGNUP */
-
-      const { data, error } =
-        await supabaseClient.auth.signUp({
-
-          email: email,
-
-          password: password,
-
-          options: {
-
-            data: {
-              full_name: name
-            }
-
-          }
-
-        });
-
-
-      if (error) {
-
-        showMessage(
-          getFriendlyError(error.message),
-          "error"
-        );
-
-        button.disabled = false;
-        button.textContent = "Create Account";
-
-        return;
-      }
-
-
-      /* SUCCESS */
-
-      if (data.user) {
-
-        if (data.session) {
-
-          showSuccess(
-            "Account created! 🎉",
-            "Your PTUT Hub account has been created successfully."
-          );
-
-        } else {
-
-          showSuccess(
-            "Account created! 📧",
-            "We have created your account. Please check your email and verify your account before logging in."
-          );
-
+        data: {
+          full_name: name
         }
 
       }
 
+    });
+
+
+  button.disabled = false;
+
+  button.textContent =
+    "Create account";
+
+
+  if(error){
+
+    showMessage(
+      "signupMessage",
+      error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(data.session){
+
+    showMessage(
+      "signupMessage",
+      "Account created successfully! You are now logged in.",
+      "success"
+    );
+
+  }else{
+
+    showMessage(
+      "signupMessage",
+      "Account created! Please check your email and verify your account before logging in.",
+      "success"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function handleLogin(event){
+
+  event.preventDefault();
+
+  const email =
+    document.getElementById("loginEmail")
+      .value.trim();
+
+  const password =
+    document.getElementById("loginPassword")
+      .value;
+
+  const button =
+    document.getElementById("loginSubmit");
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "Logging in...";
+
+
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
+
+      email: email,
+
+      password: password
+
+    });
+
+
+  button.disabled = false;
+
+  button.textContent =
+    "Log in";
+
+
+  if(error){
+
+    showMessage(
+      "loginMessage",
+      error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(data.session){
+
+    showMessage(
+      "loginMessage",
+      "Login successful! Dashboard coming next 🚀",
+      "success"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CLOSE MODAL BY CLICKING OUTSIDE
+========================================================= */
+
+authOverlay.addEventListener(
+  "click",
+  function(event){
+
+    if(event.target === authOverlay){
+
+      closeAuth();
+
     }
 
-
-    /* =========================================
-       SUCCESS SCREEN
-    ========================================= */
-
-    function showSuccess(title, text) {
-
-      app.innerHTML = `
-
-        <div class="success-page">
-
-          <div class="success-card">
-
-            <div class="success-icon">
-              ✅
-            </div>
-
-            <h2>${title}</h2>
-
-            <p>
-              ${text}
-            </p>
-
-            <button
-              class="btn btn-primary"
-              onclick="showLogin()">
-
-              Continue to Login
-
-            </button>
-
-          </div>
-
-        </div>
-
-      `;
-    }
+  }
+);
 
 
-    /* =========================================
-       PASSWORD
-    ========================================= */
+/* =========================================================
+   CHECK EXISTING SESSION
+========================================================= */
 
-    function togglePassword(id, button) {
+async function checkSession(){
 
-      const input =
-        document.getElementById(id);
+  const { data } =
+    await supabaseClient.auth.getSession();
 
-      if (input.type === "password") {
+  if(data.session){
 
-        input.type = "text";
-        button.textContent = "Hide";
+    console.log(
+      "User already logged in:",
+      data.session.user.email
+    );
 
-      } else {
+  }
 
-        input.type = "password";
-        button.textContent = "Show";
+}
 
-      }
+checkSession();
 
-    }
-
-
-    /* =========================================
-       MESSAGES
-    ========================================= */
-
-    function showMessage(text, type) {
-
-      const message =
-        document.getElementById("message");
-
-      if (!message) return;
-
-      message.className =
-        "message " + type;
-
-      message.textContent = text;
-
-    }
-
-
-    function clearMessage() {
-
-      const message =
-        document.getElementById("message");
-
-      if (!message) return;
-
-      message.className = "message";
-      message.textContent = "";
-
-    }
-
-
-    /* =========================================
-       FRIENDLY ERRORS
-    ========================================= */
-
-    function getFriendlyError(error) {
-
-      const msg = error.toLowerCase();
-
-
-      if (msg.includes("invalid login credentials")) {
-        return "Email or password is incorrect.";
-      }
-
-
-      if (msg.includes("user already registered")) {
-        return "This email is already registered. Please login.";
-      }
-
-
-      if (msg.includes("email not confirmed")) {
-        return "Please verify your email before logging in.";
-      }
-
-
-      if (msg.includes("password")) {
-        return error;
-      }
-
-
-      if (msg.includes("email")) {
-        return error;
-      }
-
-
-      return error;
-    }
-
-
-    /* =========================================
-       START
-    ========================================= */
-
-    landingPage();
-
-  </script>
+</script>
 
 </body>
 </html>
