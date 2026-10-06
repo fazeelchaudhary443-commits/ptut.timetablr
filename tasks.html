@@ -301,6 +301,7 @@ body{
   padding:20px 5px;
   border-bottom:1px solid #f1f5f9;
   position:relative;
+  overflow:visible;
 }
 
 .task:last-child{
@@ -387,7 +388,7 @@ body{
   .task-dropdown{
   position:absolute;
   right:45px;
-  top:55px;
+  bottom:55px;
   width:190px;
   background:white;
   border:1px solid #e2e8f0;
@@ -395,8 +396,9 @@ body{
   padding:7px;
   box-shadow:0 15px 35px rgba(15,23,42,.14);
   display:none;
-  z-index:50;
+  z-index:9999;
 }
+
 
 .task-dropdown.show{
   display:block;
