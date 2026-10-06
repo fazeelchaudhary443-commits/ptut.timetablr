@@ -1606,7 +1606,6 @@ function closeDeleteDialog(){
 
 }
 
-
 /* ================= ADD TASK ================= */
 
 function openModal(){
@@ -1627,7 +1626,7 @@ function closeModal(){
 }
 
 
-function addTask(){
+async function addTask(){
 
   const title =
     document
@@ -1655,15 +1654,78 @@ function addTask(){
   }
 
 
+  const {
+    data: {
+      session
+    }
+  } =
+    await supabaseClient.auth.getSession();
+
+
+  if(!session){
+
+    alert("Please login first.");
+
+    window.location.href =
+      "index.html";
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("tasks")
+      .insert({
+
+        user_id: session.user.id,
+
+        title: title,
+
+        description: null,
+
+        due_date: date || null,
+
+        priority: priority,
+
+        completed: false
+
+      })
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(
+      "Add task error:",
+      error
+    );
+
+    alert(
+      "Task could not be saved. Check console."
+    );
+
+    return;
+
+  }
+
+
   tasks.push({
 
-    title:title,
+    id: data.id,
 
-    date:date,
+    title: data.title,
 
-    priority:priority,
+    date: data.due_date,
 
-    completed:false
+    priority: data.priority,
+
+    completed: data.completed
 
   });
 
@@ -1672,11 +1734,9 @@ function addTask(){
     .getElementById("taskTitle")
     .value = "";
 
-
   document
     .getElementById("taskDate")
     .value = "";
-
 
   document
     .getElementById("taskPriority")
@@ -1688,7 +1748,6 @@ function addTask(){
   renderTasks();
 
 }
-
 
 /* ================= LOGOUT ================= */
 
