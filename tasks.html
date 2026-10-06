@@ -1108,7 +1108,84 @@ body{
   </div>
 
 </div>
+<!-- EDIT TASK MODAL -->
 
+<div class="modal" id="editModal">
+
+  <div class="modal-box">
+
+    <div class="modal-top">
+
+      <h2>Edit Task</h2>
+
+      <button
+        class="close"
+        onclick="closeEditModal()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Task Title</label>
+
+      <input
+        type="text"
+        id="editTitle"
+        placeholder="e.g. C++ Assignment"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Due Date</label>
+
+      <input
+        type="date"
+        id="editDate"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Priority</label>
+
+      <select id="editPriority">
+
+        <option value="Low">
+          Low
+        </option>
+
+        <option value="Medium">
+          Medium
+        </option>
+
+        <option value="High">
+          High
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <button
+      class="save-btn"
+      onclick="saveEditedTask()"
+    >
+      Save Changes
+    </button>
+
+  </div>
+
+</div>
 
 <script>
 
@@ -1393,25 +1470,73 @@ function completeTask(index){
 
 function editTask(index){
 
-  const newTitle =
-    prompt(
-      "Edit task title:",
-      tasks[index].title
-    );
+  document.getElementById("editTitle").value =
+    tasks[index].title;
+
+  document.getElementById("editDate").value =
+    tasks[index].date || "";
+
+  document.getElementById("editPriority").value =
+    tasks[index].priority || "Medium";
+
+  document
+    .getElementById("editModal")
+    .setAttribute("data-index", index);
+
+  document
+    .getElementById("editModal")
+    .classList.add("show");
+
+}
 
 
-  if(newTitle === null){
+function closeEditModal(){
+
+  document
+    .getElementById("editModal")
+    .classList.remove("show");
+
+}
+
+
+function saveEditedTask(){
+
+  const modal =
+    document.getElementById("editModal");
+
+  const index =
+    Number(modal.getAttribute("data-index"));
+
+  const title =
+    document
+      .getElementById("editTitle")
+      .value
+      .trim();
+
+  const date =
+    document.getElementById("editDate").value;
+
+  const priority =
+    document.getElementById("editPriority").value;
+
+
+  if(!title){
+
+    alert("Please enter a task title.");
+
     return;
+
   }
 
 
-  if(newTitle.trim() === ""){
-    return;
-  }
+  tasks[index].title = title;
+
+  tasks[index].date = date;
+
+  tasks[index].priority = priority;
 
 
-  tasks[index].title =
-    newTitle.trim();
+  closeEditModal();
 
   renderTasks();
 
