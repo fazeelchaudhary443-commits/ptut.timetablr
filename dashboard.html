@@ -1,1 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>PTUT Hub — Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --dark:#0f172a;
+  --dark-2:#1e293b;
+  --text:#334155;
+  --muted:#64748b;
+  --border:#e2e8f0;
+  --bg:#f8fafc;
+  --white:#fff;
+  --green:#16a34a;
+  --orange:#ea580c;
+  --purple:#7c3aed;
+}
+
+body{
+  font-family:Inter,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--dark);
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+  position:fixed;
+  inset:0;
+  background:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.loading.hidden{
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
+}
+
+.loader{
+  width:42px;
+  height:42px;
+  border:4px solid #dbeafe;
+  border-top-color:var(--primary);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:250px;
+  background:var(--dark);
+  color:white;
+  padding:24px 16px;
+  z-index:100;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:0 10px 30px;
+}
+
+.brand-mark{
+  width:38px;
+  height:38px;
+  border-radius:11px;
+  background:var(--primary);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  font-size:19px;
+}
+
+.brand-text{
+  font-size:19px;
+  font-weight:800;
+}
+
+.nav-title{
+  color:#64748b;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-weight:700;
+  padding:0 12px;
+  margin-bottom:9px;
+}
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.nav a{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  color:#94a3b8;
+  text-decoration:none;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:600;
+  transition:.2s;
+}
+
+.nav a:hover{
+  color:white;
+  background:var(--dark-2);
+}
+
+.nav a.active{
+  color:white;
+  background:var(--primary);
+}
+
+.nav-icon{
+  width:20px;
+  text-align:center;
+}
+
+.sidebar-bottom{
+  position:absolute;
+  left:16px;
+  right:16px;
+  bottom:20px;
+}
+
+.logout{
+  width:100%;
+  padding:11px;
+  border:1px solid #334155;
+  background:transparent;
+  color:#cbd5e1;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.2s;
+}
+
+.logout:hover{
+  background:var(--dark-2);
+  color:white;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+  margin-left:250px;
+  min-height:100vh;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar{
+  height:76px;
+  background:white;
+  border-bottom:1px solid var(--border);
+  padding:0 35px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.topbar-title h1{
+  font-size:20px;
+}
+
+.topbar-title p{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+
+.user-area{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+.notification{
+  width:40px;
+  height:40px;
+  border:1px solid var(--border);
+  background:white;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:16px;
+}
+
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:var(--primary);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+}
+
+.user-name{
+  font-size:12px;
+  font-weight:700;
+}
+
+.user-role{
+  font-size:10px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.content{
+  padding:30px 35px 50px;
+  max-width:1500px;
+}
+
+.welcome{
+  margin-bottom:25px;
+}
+
+.welcome h2{
+  font-size:28px;
+  letter-spacing:-.8px;
+}
+
+.welcome p{
+  margin-top:7px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* =========================
+   PROFILE STRIP
+========================= */
+
+.profile-strip{
+  background:linear-gradient(135deg,#0f172a,#172554);
+  color:white;
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:25px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  box-shadow:0 15px 35px rgba(15,23,42,.12);
+}
+
+.profile-main{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.profile-avatar{
+  width:55px;
+  height:55px;
+  border-radius:15px;
+  background:#2563eb;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:21px;
+  font-weight:800;
+}
+
+.profile-name{
+  font-size:17px;
+  font-weight:800;
+}
+
+.profile-email{
+  color:#94a3b8;
+  font-size:11px;
+  margin-top:4px;
+}
+
+.profile-details{
+  display:flex;
+  gap:25px;
+  flex-wrap:wrap;
+}
+
+.profile-detail label{
+  display:block;
+  color:#94a3b8;
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+  margin-bottom:5px;
+}
+
+.profile-detail span{
+  font-size:11px;
+  font-weight:700;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:17px;
+  margin-bottom:25px;
+}
+
+.stat{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:19px;
+  transition:.25s;
+}
+
+.stat:hover{
+  transform:translateY(-4px);
+  box-shadow:0 14px 30px rgba(15,23,42,.08);
+}
+
+.stat-icon{
+  width:40px;
+  height:40px;
+  border-radius:11px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:17px;
+}
+
+.blue{background:#eff6ff}
+.green{background:#f0fdf4}
+.orange{background:#fff7ed}
+.purple{background:#f5f3ff}
+
+.stat-label{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+  margin-top:14px;
+}
+
+.stat-value{
+  font-size:27px;
+  font-weight:800;
+  margin-top:4px;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.grid{
+  display:grid;
+  grid-template-columns:1.35fr .85fr;
+  gap:20px;
+}
+
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.card-header{
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.card-header h3{
+  font-size:14px;
+}
+
+.card-header span{
+  font-size:11px;
+  color:var(--primary);
+  font-weight:700;
+}
+
+.card-body{
+  padding:17px 20px;
+}
+
+/* =========================
+   CLASSES
+========================= */
+
+.class-item{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:13px 0;
+  border-bottom:1px solid #f1f5f9;
+}
+
+.class-item:last-child{
+  border-bottom:none;
+}
+
+.class-time{
+  width:65px;
+  font-size:11px;
+  color:var(--primary);
+  font-weight:800;
+}
+
+.class-info{
+  flex:1;
+}
+
+.class-name{
+  font-size:12px;
+  font-weight:700;
+}
+
+.class-meta{
+  color:var(--muted);
+  font-size:10px;
+  margin-top:4px;
+}
+
+.badge{
+  background:#eff6ff;
+  color:var(--primary);
+  padding:5px 8px;
+  border-radius:6px;
+  font-size:9px;
+  font-weight:700;
+}
+
+/* =========================
+   TASKS
+========================= */
+
+.task-item{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:12px 0;
+  border-bottom:1px solid #f1f5f9;
+}
+
+.task-item:last-child{
+  border-bottom:none;
+}
+
+.task-check{
+  width:17px;
+  height:17px;
+  border:2px solid #cbd5e1;
+  border-radius:5px;
+}
+
+.task-info{
+  flex:1;
+}
+
+.task-title{
+  font-size:11px;
+  font-weight:700;
+}
+
+.task-date{
+  font-size:9px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+/* =========================
+   EXAMS
+========================= */
+
+.exam-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 0;
+  border-bottom:1px solid #f1f5f9;
+}
+
+.exam-item:last-child{
+  border-bottom:none;
+}
+
+.exam-date{
+  width:43px;
+  height:43px;
+  border-radius:10px;
+  background:#eff6ff;
+  color:var(--primary);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+
+.exam-day{
+  font-size:15px;
+  font-weight:800;
+}
+
+.exam-month{
+  font-size:8px;
+  text-transform:uppercase;
+  font-weight:700;
+}
+
+.exam-name{
+  font-size:11px;
+  font-weight:700;
+}
+
+.exam-meta{
+  font-size:9px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+/* =========================
+   ANNOUNCEMENTS
+========================= */
+
+.announcement{
+  padding:12px 0;
+  border-bottom:1px solid #f1f5f9;
+}
+
+.announcement:last-child{
+  border-bottom:none;
+}
+
+.announcement-title{
+  font-size:11px;
+  font-weight:700;
+}
+
+.announcement-text{
+  font-size:9px;
+  color:var(--muted);
+  line-height:1.5;
+  margin-top:4px;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+  text-align:center;
+  padding:28px 10px;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.empty-icon{
+  font-size:23px;
+  margin-bottom:7px;
+}
+
+/* =========================
+   MOBILE HEADER
+========================= */
+
+.mobile-header{
+  display:none;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1100px){
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .profile-strip{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+}
+
+@media(max-width:750px){
+
+  .sidebar{
+    display:none;
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .mobile-header{
+    height:64px;
+    background:var(--dark);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+  }
+
+  .mobile-brand{
+    font-size:18px;
+    font-weight:800;
+  }
+
+  .mobile-menu{
+    border:none;
+    background:none;
+    color:white;
+    font-size:21px;
+  }
+
+  .topbar{
+    padding:0 18px;
+  }
+
+  .user-role,
+  .user-name{
+    display:none;
+  }
+
+  .content{
+    padding:23px 18px 40px;
+  }
+
+  .welcome h2{
+    font-size:23px;
+  }
+
+  .profile-details{
+    gap:17px;
+  }
+
+}
+
+@media(max-width:500px){
+
+  .stats{
+    gap:10px;
+  }
+
+  .stat{
+    padding:15px;
+  }
+
+  .stat-value{
+    font-size:22px;
+  }
+
+  .stat-label{
+    font-size:9px;
+  }
+
+  .profile-strip{
+    padding:17px;
+  }
+
+  .profile-detail span{
+    font-size:10px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="loading" id="loading">
+  <div class="loader"></div>
+</div>
+
+
+<!-- MOBILE HEADER -->
+
+<div class="mobile-header">
+
+  <div class="mobile-brand">
+    PTUT Hub
+  </div>
+
+  <button class="mobile-menu">
+    ☰
+  </button>
+
+</div>
+
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+  <div class="brand">
+
+    <div class="brand-mark">
+      P
+    </div>
+
+    <div class="brand-text">
+      PTUT Hub
+    </div>
+
+  </div>
+
+
+  <div class="nav-title">
+    Workspace
+  </div>
+
+
+  <nav class="nav">
+
+    <a href="#" class="active">
+      <span class="nav-icon">⌂</span>
+      Dashboard
+    </a>
+
+    <a href="#">
+      <span class="nav-icon">▦</span>
+      Timetable
+    </a>
+
+    <a href="#">
+      <span class="nav-icon">✓</span>
+      Tasks
+    </a>
+
+    <a href="#">
+      <span class="nav-icon">▣</span>
+      Exams
+    </a>
+
+    <a href="#">
+      <span class="nav-icon">◉</span>
+      Announcements
+    </a>
+
+    <a href="#">
+      <span class="nav-icon">⚙</span>
+      Settings
+    </a>
+
+  </nav>
+
+
+  <div class="sidebar-bottom">
+
+    <button class="logout" onclick="logout()">
+      ↪ &nbsp; Log out
+    </button>
+
+  </div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+
+  <!-- TOPBAR -->
+
+  <header class="topbar">
+
+    <div class="topbar-title">
+
+      <h1>
+        Dashboard
+      </h1>
+
+      <p id="currentDate">
+        Loading date...
+      </p>
+
+    </div>
+
+
+    <div class="user-area">
+
+      <button class="notification">
+        🔔
+      </button>
+
+      <div class="avatar" id="avatar">
+        P
+      </div>
+
+      <div>
+
+        <div class="user-name" id="userName">
+          Student
+        </div>
+
+        <div class="user-role">
+          Student
+        </div>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- CONTENT -->
+
+  <section class="content">
+
+
+    <!-- WELCOME -->
+
+    <div class="welcome">
+
+      <h2 id="welcomeText">
+        Welcome back 👋
+      </h2>
+
+      <p>
+        Here's what's happening with your academic life today.
+      </p>
+
+    </div>
+
+
+    <!-- PROFILE -->
+
+    <div class="profile-strip">
+
+      <div class="profile-main">
+
+        <div class="profile-avatar" id="profileAvatar">
+          P
+        </div>
+
+        <div>
+
+          <div class="profile-name" id="profileName">
+            Loading student...
+          </div>
+
+          <div class="profile-email" id="profileEmail">
+            Loading email...
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="profile-details">
+
+        <div class="profile-detail">
+
+          <label>
+            Roll No
+          </label>
+
+          <span id="rollNo">
+            —
+          </span>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <label>
+            Program
+          </label>
+
+          <span id="program">
+            —
+          </span>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <label>
+            Semester
+          </label>
+
+          <span id="semester">
+            —
+          </span>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <label>
+            Section
+          </label>
+
+          <span id="section">
+            —
+          </span>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <label>
+            Role
+          </label>
+
+          <span id="role">
+            STUDENT
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <div class="stat-icon blue">
+          📚
+        </div>
+
+        <div class="stat-label">
+          Today's Classes
+        </div>
+
+        <div class="stat-value" id="classCount">
+          0
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-icon green">
+          ✓
+        </div>
+
+        <div class="stat-label">
+          Pending Tasks
+        </div>
+
+        <div class="stat-value" id="taskCount">
+          0
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-icon orange">
+          📝
+        </div>
+
+        <div class="stat-label">
+          Upcoming Exams
+        </div>
+
+        <div class="stat-value" id="examCount">
+          0
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-icon purple">
+          📢
+        </div>
+
+        <div class="stat-label">
+          Announcements
+        </div>
+
+        <div class="stat-value" id="announcementCount">
+          0
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- DASHBOARD GRID -->
+
+    <div class="grid">
+
+
+      <!-- CLASSES -->
+
+      <div class="card">
+
+        <div class="card-header">
+
+          <h3>
+            Today's Classes
+          </h3>
+
+          <span>
+            View timetable →
+          </span>
+
+        </div>
+
+        <div class="card-body" id="classesList">
+
+          <div class="empty">
+
+            <div class="empty-icon">
+              📚
+            </div>
+
+            Your timetable will appear here.
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- TASKS -->
+
+      <div class="card">
+
+        <div class="card-header">
+
+          <h3>
+            Pending Tasks
+          </h3>
+
+          <span>
+            View all →
+          </span>
+
+        </div>
+
+        <div class="card-body" id="tasksList">
+
+          <div class="empty">
+
+            <div class="empty-icon">
+              ✓
+            </div>
+
+            No pending tasks
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- EXAMS -->
+
+      <div class="card">
+
+        <div class="card-header">
+
+          <h3>
+            Upcoming Exams
+          </h3>
+
+          <span>
+            View all →
+          </span>
+
+        </div>
+
+        <div class="card-body" id="examsList">
+
+          <div class="empty">
+
+            <div class="empty-icon">
+              📝
+            </div>
+
+            No upcoming exams
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ANNOUNCEMENTS -->
+
+      <div class="card">
+
+        <div class="card-header">
+
+          <h3>
+            Latest Announcements
+          </h3>
+
+          <span>
+            View all →
+          </span>
+
+        </div>
+
+        <div class="card-body" id="announcementsList">
+
+          <div class="empty">
+
+            <div class="empty-icon">
+              📢
+            </div>
+
+            No announcements yet
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<script>
+
+/* =========================================
+   SUPABASE
+========================================= */
+
+const SUPABASE_URL =
+"https://owiakeoybapbrfrmhcik.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_KxTVXqabaSm4BXRzqtUAeA_FHt8MPf-";
+
+const supabaseClient =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* =========================================
+   DATE
+========================================= */
+
+function updateDate(){
+
+  const now = new Date();
+
+  document.getElementById("currentDate").textContent =
+    now.toLocaleDateString(
+      "en-US",
+      {
+        weekday:"long",
+        month:"long",
+        day:"numeric",
+        year:"numeric"
+      }
+    );
+
+}
+
+updateDate();
+
+
+/* =========================================
+   LOAD DASHBOARD
+========================================= */
+
+async function loadDashboard(){
+
+  try{
+
+    const {
+      data:{
+        session
+      }
+    } =
+    await supabaseClient.auth.getSession();
+
+
+    /*
+      If user is not logged in,
+      send them back to landing page.
+    */
+
+    if(!session){
+
+      window.location.href="index.html";
+
+      return;
+
+    }
+
+
+    const user =
+      session.user;
+
+
+    /* =========================
+       PROFILE
+    ========================= */
+
+    const {
+      data:profile,
+      error:profileError
+    } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id",user.id)
+      .single();
+
+
+    if(profileError){
+
+      console.log(
+        "Profile error:",
+        profileError
+      );
+
+    }
+
+
+    const name =
+      profile?.full_name ||
+      user.user_metadata?.full_name ||
+      user.email?.split("@")[0] ||
+      "Student";
+
+
+    /* NAME */
+
+    document.getElementById("userName")
+      .textContent=name;
+
+    document.getElementById("profileName")
+      .textContent=name;
+
+    document.getElementById("welcomeText")
+      .textContent=
+      `Welcome back, ${name.split(" ")[0]} 👋`;
+
+
+    /* EMAIL */
+
+    document.getElementById("profileEmail")
+      .textContent=
+      profile?.email ||
+      user.email ||
+      "";
+
+
+    /* AVATAR */
+
+    const initial =
+      name.charAt(0).toUpperCase();
+
+    document.getElementById("avatar")
+      .textContent=initial;
+
+    document.getElementById("profileAvatar")
+      .textContent=initial;
+
+
+    /* =========================
+       ACADEMIC PROFILE
+    ========================= */
+
+    document.getElementById("rollNo")
+      .textContent=
+      profile?.student_id || "Not added";
+
+
+    document.getElementById("role")
+      .textContent=
+      profile?.role || "STUDENT";
+
+
+    /*
+      These are currently foreign-key IDs.
+      Once the corresponding RLS policies
+      are enabled, we will display the
+      actual names here.
+    */
+
+    document.getElementById("program")
+      .textContent=
+      profile?.program_id
+        ? "Program assigned"
+        : "Not assigned";
+
+
+    document.getElementById("semester")
+      .textContent=
+      profile?.semester_id
+        ? "Semester assigned"
+        : "Not assigned";
+
+
+    document.getElementById("section")
+      .textContent=
+      profile?.section_id
+        ? "Section assigned"
+        : "Not assigned";
+
+
+    /* =========================
+       TASKS
+    ========================= */
+
+    await loadTasks(user.id);
+
+
+    /* =========================
+       HIDE LOADER
+    ========================= */
+
+    document
+      .getElementById("loading")
+      .classList.add("hidden");
+
+
+  }catch(error){
+
+    console.error(
+      "Dashboard error:",
+      error
+    );
+
+    document
+      .getElementById("loading")
+      .classList.add("hidden");
+
+  }
+
+}
+
+
+/* =========================================
+   TASKS
+========================================= */
+
+async function loadTasks(userId){
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("tasks")
+    .select("*")
+    .eq("user_id",userId)
+    .order("due_date",{ascending:true});
+
+
+  if(error){
+
+    console.log(
+      "Tasks error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  const tasks =
+    (data || []).filter(task =>
+      task.completed !== true &&
+      task.is_completed !== true
+    );
+
+
+  document.getElementById("taskCount")
+    .textContent=tasks.length;
+
+
+  const container =
+    document.getElementById("tasksList");
+
+
+  if(!tasks.length){
+
+    container.innerHTML=`
+
+      <div class="empty">
+
+        <div class="empty-icon">
+          ✓
+        </div>
+
+        No pending tasks
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    tasks.slice(0,5)
+      .map(task => `
+
+        <div class="task-item">
+
+          <div class="task-check"></div>
+
+          <div class="task-info">
+
+            <div class="task-title">
+              ${escapeHTML(
+                task.title ||
+                "Untitled Task"
+              )}
+            </div>
+
+            <div class="task-date">
+
+              ${
+                task.due_date
+                ? "Due: " +
+                  formatDate(task.due_date)
+                : "No due date"
+              }
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `)
+      .join("");
+
+}
+
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function formatDate(date){
+
+  return new Date(date)
+    .toLocaleDateString(
+      "en-US",
+      {
+        month:"short",
+        day:"numeric"
+      }
+    );
+
+}
+
+
+function escapeHTML(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  window.location.href="index.html";
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>
