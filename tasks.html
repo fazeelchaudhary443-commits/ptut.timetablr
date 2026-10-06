@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Tasks — PTUT Hub</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Inter,Arial,sans-serif;
+}
+
+body{
+  background:#f8fafc;
+  color:#0f172a;
+}
+
+.topbar{
+  height:70px;
+  background:#fff;
+  border-bottom:1px solid #e2e8f0;
+  display:flex;
+  align-items:center;
+  padding:0 30px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:800;
+  color:#2563eb;
+}
+
+.back{
+  margin-left:auto;
+  text-decoration:none;
+  color:#475569;
+  font-weight:600;
+}
+
+.back:hover{
+  color:#2563eb;
+}
+
+.container{
+  max-width:1100px;
+  margin:40px auto;
+  padding:0 20px;
+}
+
+.header{
+  margin-bottom:28px;
+}
+
+.header h1{
+  font-size:32px;
+  margin-bottom:8px;
+}
+
+.header p{
+  color:#64748b;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:20px;
+}
+
+.task{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  padding:18px 0;
+  border-bottom:1px solid #e2e8f0;
+}
+
+.task:last-child{
+  border-bottom:none;
+}
+
+.check{
+  width:22px;
+  height:22px;
+  border:2px solid #cbd5e1;
+  border-radius:7px;
+  flex-shrink:0;
+}
+
+.task-info{
+  flex:1;
+}
+
+.task-title{
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+.task-date{
+  font-size:13px;
+  color:#64748b;
+}
+
+.badge{
+  padding:6px 10px;
+  border-radius:8px;
+  background:#eff6ff;
+  color:#2563eb;
+  font-size:12px;
+  font-weight:700;
+}
+
+.empty{
+  text-align:center;
+  padding:45px 20px;
+  color:#64748b;
+}
+
+@media(max-width:650px){
+
+  .topbar{
+    padding:0 18px;
+  }
+
+  .container{
+    margin:25px auto;
+  }
+
+  .header h1{
+    font-size:27px;
+  }
+
+  .task{
+    align-items:flex-start;
+  }
+
+  .badge{
+    display:none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <div class="logo">
+    PTUT Hub
+  </div>
+
+  <a href="dashboard.html" class="back">
+    ← Dashboard
+  </a>
+
+</header>
+
+<main class="container">
+
+  <div class="header">
+
+    <h1>My Tasks</h1>
+
+    <p>
+      Keep track of your assignments, projects and academic tasks.
+    </p>
+
+  </div>
+
+  <div class="card">
+
+    <div class="task">
+
+      <div class="check"></div>
+
+      <div class="task-info">
+        <div class="task-title">
+          No tasks added yet
+        </div>
+
+        <div class="task-date">
+          Your academic tasks will appear here.
+        </div>
+      </div>
+
+      <div class="badge">
+        Pending
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+</body>
+</html>
