@@ -1773,10 +1773,78 @@ document
       }
     );
 
+/* ================= LOAD TASKS ================= */
 
+async function loadTasks(){
+
+  const {
+    data:{
+      session
+    }
+  } =
+    await supabaseClient.auth.getSession();
+
+
+  if(!session){
+
+    window.location.href = "index.html";
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("tasks")
+      .select("*")
+      .eq("user_id", session.user.id)
+      .order("due_date", { ascending:true });
+
+
+  if(error){
+
+    console.error(
+      "Load tasks error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  tasks.length = 0;
+
+
+  (data || []).forEach(task => {
+
+    tasks.push({
+
+      id: task.id,
+
+      title: task.title,
+
+      date: task.due_date,
+
+      priority: task.priority,
+
+      completed: task.completed
+
+    });
+
+  });
+
+
+  renderTasks();
+
+}
 /* ================= START ================= */
 
-renderTasks();
+loadTasks();
 
 </script>
 
