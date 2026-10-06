@@ -1577,13 +1577,40 @@ function askDelete(index){
 
 
 /* ================= CONFIRM DELETE ================= */
-
-function confirmDelete(){
+async function confirmDelete(){
 
   if(deleteIndex === null){
     return;
   }
 
+  const task = tasks[deleteIndex];
+
+  if(!task || !task.id){
+    alert("Task ID not found.");
+    return;
+  }
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("tasks")
+      .delete()
+      .eq("id", task.id);
+
+  if(error){
+
+    console.error(
+      "Delete task error:",
+      error
+    );
+
+    alert(
+      "Task could not be deleted. Check console."
+    );
+
+    return;
+  }
 
   tasks.splice(deleteIndex,1);
 
@@ -1594,7 +1621,6 @@ function confirmDelete(){
   renderTasks();
 
 }
-
 
 /* ================= CANCEL DELETE ================= */
 
