@@ -1196,6 +1196,18 @@ body{
 </div>
 
 <script>
+  const SUPABASE_URL =
+  "https://owiakeoybapbrfrmhcik.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_KxTVXqabaSm4BXRzqtUAeA_FHt8MPf-";
+
+const supabaseClient =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
 
 const tasks = [];
 
