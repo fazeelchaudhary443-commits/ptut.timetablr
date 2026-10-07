@@ -816,8 +816,49 @@ body{
     transform:translateY(0) scale(1);
   }
 }
+  /* ================= DELETE ANIMATION ================= */
+
+.delete-animation-overlay{
+  position:fixed;
+  width:110px;
+  height:110px;
+  right:35px;
+  bottom:35px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  z-index:99999;
+}
+
+.delete-animation-overlay.show{
+  display:flex;
+}
+
+.delete-animation-overlay lottie-player{
+  width:110px;
+  height:110px;
+}
+/* ================= TASK THROW ANIMATION ================= */
+
+.task.throwing{
+  position:relative;
+  z-index:99998;
+  transition:
+    transform .7s cubic-bezier(.55,-0.4,.8,.2),
+    opacity .7s ease;
+  transform:
+    translate(
+      calc(100vw - 360px),
+      calc(100vh - 180px)
+    )
+    rotate(18deg)
+    scale(.35);
+  opacity:0;
+}  
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </head>
 
 <body>
@@ -1400,7 +1441,7 @@ function renderTasks(){
 
     return `
 
-      <div class="task">
+    <div class="task" data-task-id="${task.id}">
 
     <div
   class="checkbox ${task.completed ? "checked" : ""}"
@@ -1695,6 +1736,7 @@ function askDelete(index){
 
 
 /* ================= CONFIRM DELETE ================= */
+
 async function confirmDelete(){
 
   if(deleteIndex === null){
@@ -1708,6 +1750,50 @@ async function confirmDelete(){
     return;
   }
 
+  const taskElement =
+    document.querySelector(
+      `[data-task-id="${task.id}"]`
+    );
+
+  /* Close confirmation dialog immediately */
+  closeDeleteDialog();
+
+  /* Start task throw animation */
+  if(taskElement){
+
+    taskElement.classList.add("throwing");
+
+    const animationOverlay =
+      document.getElementById(
+        "deleteAnimationOverlay"
+      );
+
+    const animation =
+      document.getElementById(
+        "deleteAnimation"
+      );
+
+    animationOverlay.classList.add("show");
+
+    animation.style.position = "fixed";
+
+    animation.style.left =
+      (window.innerWidth - 145) + "px";
+
+    animation.style.top =
+      (window.innerHeight - 145) + "px";
+
+    animation.stop();
+    animation.play();
+
+  }
+
+  /* Wait for throw animation */
+  await new Promise(
+    resolve => setTimeout(resolve, 700)
+  );
+
+  /* Delete from Supabase */
   const {
     error
   } =
@@ -1723,6 +1809,19 @@ async function confirmDelete(){
       error
     );
 
+    /* Restore task if delete fails */
+    if(taskElement){
+      taskElement.classList.remove(
+        "throwing"
+      );
+    }
+
+    document
+      .getElementById(
+        "deleteAnimationOverlay"
+      )
+      .classList.remove("show");
+
     alert(
       "Task could not be deleted. Check console."
     );
@@ -1730,16 +1829,25 @@ async function confirmDelete(){
     return;
   }
 
-  tasks.splice(deleteIndex,1);
+  /* Remove task from local array */
+  tasks.splice(
+    deleteIndex,
+    1
+  );
 
   deleteIndex = null;
 
-  closeDeleteDialog();
+  /* Hide delete animation */
+  document
+    .getElementById(
+      "deleteAnimationOverlay"
+    )
+    .classList.remove("show");
 
+  /* Refresh task list */
   renderTasks();
 
 }
-
 /* ================= CANCEL DELETE ================= */
 
 function closeDeleteDialog(){
@@ -2002,6 +2110,15 @@ async function loadTasks(){
 loadTasks();
 
 </script>
-
+<!-- DELETE ANIMATION -->
+<div class="delete-animation-overlay" id="deleteAnimationOverlay">
+  <lottie-player
+    id="deleteAnimation"
+    src="delete-bin.json"
+    background="transparent"
+    speed="1"
+    loop="false">
+  </lottie-player>
+</div>
 </body>
 </html>
