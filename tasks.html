@@ -769,6 +769,52 @@ body{
     padding:5px 15px;
   }
 }
+  /* ================= TASK VALIDATION ================= */
+
+.task-message{
+  display:none;
+  align-items:center;
+  gap:10px;
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#fef2f2;
+  border:1px solid #fecaca;
+  color:#dc2626;
+  font-size:12px;
+  font-weight:600;
+  animation:taskMessageIn .25s ease;
+}
+
+.task-message.show{
+  display:flex;
+}
+
+.task-message-icon{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:#dc2626;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:800;
+  flex-shrink:0;
+}
+
+@keyframes taskMessageIn{
+  from{
+    opacity:0;
+    transform:translateY(-6px) scale(.98);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1027,13 +1073,18 @@ body{
 
       <label>Task Title</label>
 
-      <input
-        type="text"
-        id="taskTitle"
-        placeholder="e.g. C++ Assignment"
-      >
+     <input
+  type="text"
+  id="taskTitle"
+  placeholder="e.g. C++ Assignment"
+>
 
-    </div>
+<div class="task-message" id="taskMessage">
+  <div class="task-message-icon">!</div>
+  <span id="taskMessageText">Please enter a task title.</span>
+</div>
+
+</div>
 
 
     <div class="form-group">
@@ -1703,14 +1754,25 @@ async function addTask(){
       .value;
 
 
-  if(!title){
+ if(!title){
 
-    alert("Please enter a task title.");
+  const message =
+    document.getElementById("taskMessage");
 
-    return;
+  const messageText =
+    document.getElementById("taskMessageText");
 
-  }
+  messageText.textContent =
+    "Please enter a task title.";
 
+  message.classList.add("show");
+
+  return;
+
+}
+  document
+  .getElementById("taskMessage")
+  .classList.remove("show");
 
   const {
     data: {
