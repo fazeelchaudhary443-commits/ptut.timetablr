@@ -1760,14 +1760,11 @@ async function confirmDelete(){
     return;
   }
 
-  /* Get task position */
+  /* ================= POSITIONS ================= */
+
   const taskRect =
     taskElement.getBoundingClientRect();
 
-  /* Close confirmation dialog */
-  closeDeleteDialog();
-
-  /* Get animation */
   const overlay =
     document.getElementById(
       "deleteAnimationOverlay"
@@ -1778,57 +1775,71 @@ async function confirmDelete(){
       "deleteAnimation"
     );
 
-  /* Show dustbin */
+  /* Dustbin size */
+  const binSize = 110;
+
+  /* Dustbin center */
+  const binCenterX =
+    window.innerWidth - 35 - (binSize / 2);
+
+  const binCenterY =
+    window.innerHeight - 35 - (binSize / 2);
+
+  /* Task center */
+  const taskCenterX =
+    taskRect.left + (taskRect.width / 2);
+
+  const taskCenterY =
+    taskRect.top + (taskRect.height / 2);
+
+  /* Exact movement */
+  const moveX =
+    binCenterX - taskCenterX;
+
+  const moveY =
+    binCenterY - taskCenterY;
+
+  /* ================= CLOSE DIALOG ================= */
+
+  closeDeleteDialog();
+
+  /* ================= SHOW DUSTBIN ================= */
+
+  overlay.style.left = "auto";
+  overlay.style.right = "35px";
+  overlay.style.top = "auto";
+  overlay.style.bottom = "35px";
+
   overlay.classList.add("show");
 
-  /* Position dustbin at bottom-right */
-  overlay.style.left =
-    (window.innerWidth - 140) + "px";
-
-  overlay.style.top =
-    (window.innerHeight - 140) + "px";
-
-  overlay.style.right = "auto";
-  overlay.style.bottom = "auto";
-
-  /* Reset Lottie */
+  /* Reset animation */
   animation.stop();
   animation.seek(0);
 
-  /* Calculate movement */
-  const startX = 0;
-  const startY = 0;
+  /* ================= THROW TASK ================= */
 
-  const targetX =
-    (window.innerWidth - 140) -
-    taskRect.left;
-
-  const targetY =
-    (window.innerHeight - 140) -
-    taskRect.top;
-
-  /* Animate task toward dustbin */
   taskElement.style.transition =
-    "transform 0.75s cubic-bezier(.45,-0.1,.75,.25), opacity 0.75s ease";
+    "transform 0.75s cubic-bezier(.45,-0.15,.75,.25), opacity 0.75s ease";
 
   taskElement.style.transform =
-    `translate(${targetX}px, ${targetY}px) rotate(15deg) scale(0.25)`;
+    `translate(${moveX}px, ${moveY}px) rotate(18deg) scale(0.25)`;
 
   taskElement.style.opacity = "0";
 
-  /* Start dustbin animation slightly later */
+  /* Dustbin opens when task reaches it */
   setTimeout(() => {
 
     animation.play();
 
-  }, 450);
+  }, 500);
 
-  /* Wait for visual animation */
+  /* Wait */
   await new Promise(
     resolve => setTimeout(resolve, 800)
   );
 
-  /* Delete from Supabase */
+  /* ================= DELETE FROM SUPABASE ================= */
+
   const {
     error
   } =
@@ -1857,7 +1868,8 @@ async function confirmDelete(){
     return;
   }
 
-  /* Remove from local array */
+  /* ================= REMOVE TASK ================= */
+
   tasks.splice(
     deleteIndex,
     1
@@ -1865,10 +1877,8 @@ async function confirmDelete(){
 
   deleteIndex = null;
 
-  /* Hide animation */
   overlay.classList.remove("show");
 
-  /* Refresh task list */
   renderTasks();
 
 }
