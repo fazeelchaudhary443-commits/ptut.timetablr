@@ -1601,13 +1601,21 @@ function closeEditModal(){
 }
 
 
-function saveEditedTask(){
+async function saveEditedTask(){
 
   const modal =
     document.getElementById("editModal");
 
   const index =
     Number(modal.getAttribute("data-index"));
+
+  const task =
+    tasks[index];
+
+  if(!task || !task.id){
+    alert("Task ID not found.");
+    return;
+  }
 
   const title =
     document
@@ -1616,35 +1624,61 @@ function saveEditedTask(){
       .trim();
 
   const date =
-    document.getElementById("editDate").value;
+    document
+      .getElementById("editDate")
+      .value;
 
   const priority =
-    document.getElementById("editPriority").value;
-
+    document
+      .getElementById("editPriority")
+      .value;
 
   if(!title){
 
-   showTaskMessage("Please enter a task title.", "error");
+    alert("Please enter a task title.");
 
     return;
-
   }
 
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("tasks")
+      .update({
+        title: title,
+        due_date: date || null,
+        priority: priority
+      })
+      .eq("id", task.id);
 
-  tasks[index].title = title;
+  if(error){
 
-  tasks[index].date = date;
+    console.error(
+      "Edit task error:",
+      error
+    );
 
-  tasks[index].priority = priority;
+    alert(
+      "Task could not be updated. Check console."
+    );
 
+    return;
+  }
+
+  tasks[index].title =
+    title;
+
+  tasks[index].date =
+    date;
+
+  tasks[index].priority =
+    priority;
 
   closeEditModal();
 
   renderTasks();
-
 }
-
-
 /* ================= DELETE CONFIRMATION ================= */
 
 function askDelete(index){
