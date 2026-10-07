@@ -1,3 +1,4 @@
+tasks.html :
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -816,9 +817,7 @@ body{
   }
 }
 </style>
-  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </head>
 
 <body>
@@ -1137,17 +1136,9 @@ body{
 
   <div class="delete-box">
 
-  <div class="delete-icon">
-  <lottie-player
-    id="deleteAnimation"
-    src="delete-bin.json"
-    background="transparent"
-    speed="1"
-    autoplay
-    loop="false"
-    style="width:58px;height:58px;">
-  </lottie-player>
-</div>
+    <div class="delete-icon">
+      🗑
+    </div>
 
     <h3>Delete Task?</h3>
 
@@ -1741,25 +1732,11 @@ async function confirmDelete(){
 
   tasks.splice(deleteIndex,1);
 
-  const animation =
-    document.getElementById("deleteAnimation");
+  deleteIndex = null;
 
-  if(animation){
+  closeDeleteDialog();
 
-    animation.stop();
-    animation.play();
-
-  }
-
-  setTimeout(() => {
-
-    deleteIndex = null;
-
-    closeDeleteDialog();
-
-    renderTasks();
-
-  }, 1000);
+  renderTasks();
 
 }
 
