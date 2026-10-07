@@ -1047,10 +1047,23 @@ body{
   transform-origin:center center;
 
   transition:
-    transform .85s
-    cubic-bezier(.45,-.25,.7,.15),
-    opacity .85s ease;
-} 
+    transform 2.4s
+    cubic-bezier(.45,.05,.25,1),
+    opacity 2.4s ease;
+}
+
+
+/* ================= DELETE FALL ================= */
+
+.task.throwing.delete-fall{
+  transform:
+    translateX(420px)
+    translateY(120px)
+    rotate(18deg)
+    scale(.18);
+
+  opacity:0;
+}
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
