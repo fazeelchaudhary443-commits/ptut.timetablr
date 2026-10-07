@@ -1778,10 +1778,8 @@ async function confirmDelete(){
 
   overlay.classList.add("show");
 
-  /* Let browser calculate actual position */
-  await new Promise(
-    resolve =>
-      requestAnimationFrame(resolve)
+  await new Promise(resolve =>
+    requestAnimationFrame(resolve)
   );
 
   /* ================= GET POSITIONS ================= */
@@ -1792,25 +1790,22 @@ async function confirmDelete(){
   const binRect =
     overlay.getBoundingClientRect();
 
-  /* Task center */
   const taskCenterX =
     taskRect.left +
-    (taskRect.width / 2);
+    taskRect.width / 2;
 
   const taskCenterY =
     taskRect.top +
-    (taskRect.height / 2);
+    taskRect.height / 2;
 
-  /* Dustbin center */
   const binCenterX =
     binRect.left +
-    (binRect.width / 2);
+    binRect.width / 2;
 
   const binCenterY =
     binRect.top +
-    (binRect.height / 2);
+    binRect.height / 2;
 
-  /* Exact movement */
   const moveX =
     binCenterX - taskCenterX;
 
@@ -1834,49 +1829,24 @@ async function confirmDelete(){
 
   taskElement.style.opacity = "0";
 
-  /* ================= PLAY DUSTBIN ================= */
+  /* ================= WAIT FOR TASK TO REACH BIN ================= */
 
-  setTimeout(() => {
+  await new Promise(resolve =>
+    setTimeout(resolve, 700)
+  );
 
-    animation.play();
+  /* ================= PLAY LOTTIE ONCE ================= */
 
-  }, 700);
+  animation.stop();
+  animation.seek(0);
 
-  /* ================= WAIT FOR LOTTIE ================= */
+  animation.play();
 
-  await new Promise(resolve => {
+  /* ================= WAIT FOR ONE ANIMATION ================= */
 
-    let finished = false;
-
-    function finish(){
-
-      if(finished){
-        return;
-      }
-
-      finished = true;
-
-      animation.removeEventListener(
-        "complete",
-        finish
-      );
-
-      resolve();
-
-    }
-
-    animation.addEventListener(
-      "complete",
-      finish
-    );
-
-    /* Safety fallback */
-    setTimeout(
-      finish,
-      3500
-    );
-
-  });
+  await new Promise(resolve =>
+    setTimeout(resolve, 2200)
+  );
 
   /* ================= DELETE FROM SUPABASE ================= */
 
@@ -1896,6 +1866,7 @@ async function confirmDelete(){
     );
 
     /* Restore task */
+
     taskElement.style.transition = "none";
     taskElement.style.transform = "";
     taskElement.style.opacity = "";
@@ -1918,10 +1889,12 @@ async function confirmDelete(){
 
   deleteIndex = null;
 
-  /* Hide dustbin */
+  /* ================= HIDE ANIMATION ================= */
+
   overlay.classList.remove("show");
 
-  /* Refresh task list */
+  /* ================= REFRESH TASK LIST ================= */
+
   renderTasks();
 
 }
