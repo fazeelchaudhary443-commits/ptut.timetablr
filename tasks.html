@@ -820,8 +820,8 @@ body{
 
 .delete-animation-overlay{
   position:fixed;
-  width:110px;
-  height:110px;
+  width:140px;
+  height:140px;
   right:35px;
   bottom:35px;
   display:none;
@@ -836,8 +836,8 @@ body{
 }
 
 .delete-animation-overlay lottie-player{
-  width:110px;
-  height:110px;
+  width:140px;
+  height:140px;
 }
 /* ================= TASK THROW ANIMATION ================= */
 
@@ -1760,11 +1760,6 @@ async function confirmDelete(){
     return;
   }
 
-  /* ================= POSITIONS ================= */
-
-  const taskRect =
-    taskElement.getBoundingClientRect();
-
   const overlay =
     document.getElementById(
       "deleteAnimationOverlay"
@@ -1775,22 +1770,45 @@ async function confirmDelete(){
       "deleteAnimation"
     );
 
-  /* Dustbin size */
-  const binSize = 110;
+  /* ================= CLOSE DIALOG ================= */
 
-  /* Dustbin center */
-  const binCenterX =
-    window.innerWidth - 35 - (binSize / 2);
+  closeDeleteDialog();
 
-  const binCenterY =
-    window.innerHeight - 35 - (binSize / 2);
+  /* ================= SHOW DUSTBIN ================= */
+
+  overlay.classList.add("show");
+
+  /* Let browser calculate actual position */
+  await new Promise(
+    resolve =>
+      requestAnimationFrame(resolve)
+  );
+
+  /* ================= GET POSITIONS ================= */
+
+  const taskRect =
+    taskElement.getBoundingClientRect();
+
+  const binRect =
+    overlay.getBoundingClientRect();
 
   /* Task center */
   const taskCenterX =
-    taskRect.left + (taskRect.width / 2);
+    taskRect.left +
+    (taskRect.width / 2);
 
   const taskCenterY =
-    taskRect.top + (taskRect.height / 2);
+    taskRect.top +
+    (taskRect.height / 2);
+
+  /* Dustbin center */
+  const binCenterX =
+    binRect.left +
+    (binRect.width / 2);
+
+  const binCenterY =
+    binRect.top +
+    (binRect.height / 2);
 
   /* Exact movement */
   const moveX =
@@ -1799,44 +1817,66 @@ async function confirmDelete(){
   const moveY =
     binCenterY - taskCenterY;
 
-  /* ================= CLOSE DIALOG ================= */
+  /* ================= RESET LOTTIE ================= */
 
-  closeDeleteDialog();
-
-  /* ================= SHOW DUSTBIN ================= */
-
-  overlay.style.left = "auto";
-  overlay.style.right = "35px";
-  overlay.style.top = "auto";
-  overlay.style.bottom = "35px";
-
-  overlay.classList.add("show");
-
-  /* Reset animation */
   animation.stop();
   animation.seek(0);
 
   /* ================= THROW TASK ================= */
 
   taskElement.style.transition =
-    "transform 0.75s cubic-bezier(.45,-0.15,.75,.25), opacity 0.75s ease";
+    "transform 1s cubic-bezier(.45,-0.15,.7,.2), opacity 1s ease";
 
   taskElement.style.transform =
-    `translate(${moveX}px, ${moveY}px) rotate(18deg) scale(0.25)`;
+    `translate(${moveX}px, ${moveY}px)
+     rotate(20deg)
+     scale(0.12)`;
 
   taskElement.style.opacity = "0";
 
-  /* Dustbin opens when task reaches it */
+  /* ================= PLAY DUSTBIN ================= */
+
   setTimeout(() => {
 
     animation.play();
 
-  }, 500);
+  }, 700);
 
-  /* Wait */
-  await new Promise(
-    resolve => setTimeout(resolve, 800)
-  );
+  /* ================= WAIT FOR LOTTIE ================= */
+
+  await new Promise(resolve => {
+
+    let finished = false;
+
+    function finish(){
+
+      if(finished){
+        return;
+      }
+
+      finished = true;
+
+      animation.removeEventListener(
+        "complete",
+        finish
+      );
+
+      resolve();
+
+    }
+
+    animation.addEventListener(
+      "complete",
+      finish
+    );
+
+    /* Safety fallback */
+    setTimeout(
+      finish,
+      3500
+    );
+
+  });
 
   /* ================= DELETE FROM SUPABASE ================= */
 
@@ -1855,6 +1895,7 @@ async function confirmDelete(){
       error
     );
 
+    /* Restore task */
     taskElement.style.transition = "none";
     taskElement.style.transform = "";
     taskElement.style.opacity = "";
@@ -1877,8 +1918,10 @@ async function confirmDelete(){
 
   deleteIndex = null;
 
+  /* Hide dustbin */
   overlay.classList.remove("show");
 
+  /* Refresh task list */
   renderTasks();
 
 }
