@@ -816,16 +816,16 @@ body{
     transform:translateY(0) scale(1);
   }
 }
-  /* ================= DELETE ANIMATION ================= */
+/* ================= CUSTOM DELETE ANIMATION ================= */
 
 .delete-animation-overlay{
   position:fixed;
-  width:140px;
-  height:140px;
   right:35px;
-  bottom:35px;
+  bottom:30px;
+  width:120px;
+  height:145px;
   display:none;
-  align-items:center;
+  align-items:flex-end;
   justify-content:center;
   pointer-events:none;
   z-index:99999;
@@ -835,30 +835,225 @@ body{
   display:flex;
 }
 
-.delete-animation-overlay lottie-player{
-  width:140px;
-  height:140px;
+
+/* ================= DUSTBIN ================= */
+
+.delete-bin{
+  position:relative;
+  width:82px;
+  height:92px;
+  filter:drop-shadow(
+    0 12px 15px rgba(15,23,42,.20)
+  );
 }
-/* ================= TASK THROW ANIMATION ================= */
+
+
+/* BIN BODY */
+
+.delete-bin-body{
+  position:absolute;
+  left:8px;
+  bottom:0;
+  width:66px;
+  height:72px;
+  background:linear-gradient(
+    135deg,
+    #475569,
+    #1e293b
+  );
+  border-radius:8px 8px 13px 13px;
+  transform-origin:top center;
+}
+
+
+/* BIN LINES */
+
+.delete-bin-body::before{
+  content:"";
+  position:absolute;
+  left:15px;
+  top:14px;
+  width:4px;
+  height:45px;
+  border-radius:5px;
+  background:rgba(255,255,255,.16);
+
+  box-shadow:
+    15px 0 rgba(255,255,255,.16),
+    30px 0 rgba(255,255,255,.16);
+}
+
+
+/* BIN LID */
+
+.delete-bin-lid{
+  position:absolute;
+  left:3px;
+  top:5px;
+  width:76px;
+  height:13px;
+  border-radius:7px;
+  background:#334155;
+  transform-origin:left center;
+  z-index:3;
+}
+
+
+/* LID HANDLE */
+
+.delete-bin-lid::after{
+  content:"";
+  position:absolute;
+  left:28px;
+  top:-8px;
+  width:20px;
+  height:7px;
+  border-radius:5px 5px 2px 2px;
+  background:#475569;
+}
+
+
+/* TRASH SYMBOL */
+
+.delete-bin-icon{
+  position:absolute;
+  left:27px;
+  top:32px;
+  color:#e2e8f0;
+  font-size:27px;
+  font-weight:800;
+  z-index:2;
+}
+
+
+/* ================= BIN ANIMATION ================= */
+
+.delete-animation-overlay.show .delete-bin-lid{
+  animation:
+    binLid
+    .65s
+    cubic-bezier(.2,.8,.2,1)
+    forwards;
+}
+
+.delete-animation-overlay.show .delete-bin-body{
+  animation:
+    binPulse
+    .65s
+    ease
+    .45s
+    forwards;
+}
+
+
+@keyframes binLid{
+
+  0%{
+    transform:rotate(0deg);
+  }
+
+  45%{
+    transform:rotate(-32deg);
+  }
+
+  100%{
+    transform:rotate(-24deg);
+  }
+
+}
+
+
+@keyframes binPulse{
+
+  0%{
+    transform:scale(1);
+  }
+
+  45%{
+    transform:scale(1.05);
+  }
+
+  100%{
+    transform:scale(1);
+  }
+
+}
+
+
+/* ================= DELETE SPARKS ================= */
+
+.delete-spark{
+  position:absolute;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#2563eb;
+  opacity:0;
+}
+
+.delete-spark.one{
+  right:4px;
+  top:25px;
+}
+
+.delete-spark.two{
+  left:2px;
+  top:48px;
+}
+
+.delete-spark.three{
+  right:12px;
+  top:70px;
+}
+
+.delete-animation-overlay.show .delete-spark{
+  animation:
+    spark
+    .55s
+    ease
+    .55s
+    forwards;
+}
+
+
+@keyframes spark{
+
+  0%{
+    opacity:0;
+    transform:
+      scale(.4)
+      translateY(8px);
+  }
+
+  40%{
+    opacity:1;
+  }
+
+  100%{
+    opacity:0;
+    transform:
+      scale(1.3)
+      translateY(-12px);
+  }
+
+}
+
+
+/* ================= TASK THROW ================= */
 
 .task.throwing{
   position:relative;
   z-index:99998;
+  transform-origin:center center;
+
   transition:
-    transform .7s cubic-bezier(.55,-0.4,.8,.2),
-    opacity .7s ease;
-  transform:
-    translate(
-      calc(100vw - 360px),
-      calc(100vh - 180px)
-    )
-    rotate(18deg)
-    scale(.35);
-  opacity:0;
-}  
+    transform .85s
+    cubic-bezier(.45,-.25,.7,.15),
+    opacity .85s ease;
+} 
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
 </head>
 
 <body>
@@ -1765,18 +1960,24 @@ async function confirmDelete(){
       "deleteAnimationOverlay"
     );
 
-  const animation =
-    document.getElementById(
-      "deleteAnimation"
-    );
+  if(!overlay){
+    alert("Delete animation not found.");
+    return;
+  }
 
   /* ================= CLOSE DIALOG ================= */
 
   closeDeleteDialog();
 
-  /* ================= SHOW DUSTBIN ================= */
+  /* ================= RESET ANIMATION ================= */
+
+  overlay.classList.remove("show");
+
+  void overlay.offsetWidth;
 
   overlay.classList.add("show");
+
+  /* ================= WAIT FOR RENDER ================= */
 
   await new Promise(resolve =>
     requestAnimationFrame(resolve)
@@ -1812,40 +2013,22 @@ async function confirmDelete(){
   const moveY =
     binCenterY - taskCenterY;
 
-  /* ================= RESET LOTTIE ================= */
-
-  animation.stop();
-  animation.seek(0);
-
   /* ================= THROW TASK ================= */
 
   taskElement.style.transition =
-    "transform 1s cubic-bezier(.45,-0.15,.7,.2), opacity 1s ease";
+    "transform .9s cubic-bezier(.45,-.25,.7,.15), opacity .9s ease";
 
   taskElement.style.transform =
     `translate(${moveX}px, ${moveY}px)
-     rotate(20deg)
-     scale(0.12)`;
+     rotate(360deg)
+     scale(.08)`;
 
   taskElement.style.opacity = "0";
 
-  /* ================= WAIT FOR TASK TO REACH BIN ================= */
+  /* ================= WAIT FOR TASK ================= */
 
   await new Promise(resolve =>
-    setTimeout(resolve, 700)
-  );
-
-  /* ================= PLAY LOTTIE ONCE ================= */
-
-  animation.stop();
-  animation.seek(0);
-
-  animation.play();
-
-  /* ================= WAIT FOR ONE ANIMATION ================= */
-
-  await new Promise(resolve =>
-    setTimeout(resolve, 2200)
+    setTimeout(resolve, 950)
   );
 
   /* ================= DELETE FROM SUPABASE ================= */
@@ -1858,6 +2041,8 @@ async function confirmDelete(){
       .delete()
       .eq("id", task.id);
 
+  /* ================= DELETE ERROR ================= */
+
   if(error){
 
     console.error(
@@ -1865,11 +2050,14 @@ async function confirmDelete(){
       error
     );
 
-    /* Restore task */
+    taskElement.style.transition =
+      "none";
 
-    taskElement.style.transition = "none";
-    taskElement.style.transform = "";
-    taskElement.style.opacity = "";
+    taskElement.style.transform =
+      "";
+
+    taskElement.style.opacity =
+      "";
 
     overlay.classList.remove("show");
 
@@ -1889,11 +2077,11 @@ async function confirmDelete(){
 
   deleteIndex = null;
 
-  /* ================= HIDE ANIMATION ================= */
+  /* ================= HIDE DUSTBIN ================= */
 
   overlay.classList.remove("show");
 
-  /* ================= REFRESH TASK LIST ================= */
+  /* ================= REFRESH TASKS ================= */
 
   renderTasks();
 
@@ -2162,13 +2350,25 @@ loadTasks();
 </script>
 <!-- DELETE ANIMATION -->
 <div class="delete-animation-overlay" id="deleteAnimationOverlay">
-  <lottie-player
-    id="deleteAnimation"
-    src="delete-bin.json"
-    background="transparent"
-    speed="1"
-    loop="false">
-  </lottie-player>
+
+  <div class="delete-bin">
+
+    <div class="delete-bin-lid"></div>
+
+    <div class="delete-bin-body">
+
+      <div class="delete-bin-icon">
+        🗑
+      </div>
+
+    </div>
+
+    <div class="delete-spark one"></div>
+    <div class="delete-spark two"></div>
+    <div class="delete-spark three"></div>
+
+  </div>
+
 </div>
 </body>
 </html>
