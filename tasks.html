@@ -1475,10 +1475,42 @@ document.addEventListener("click",function(){
 
 /* ================= COMPLETE ================= */
 
-function completeTask(index){
+async function completeTask(index){
 
-  tasks[index].completed =
-    !tasks[index].completed;
+  const task = tasks[index];
+
+  if(!task || !task.id){
+    alert("Task ID not found.");
+    return;
+  }
+
+  const newStatus = !task.completed;
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("tasks")
+      .update({
+        completed: newStatus
+      })
+      .eq("id", task.id);
+
+  if(error){
+
+    console.error(
+      "Complete task error:",
+      error
+    );
+
+    alert(
+      "Task status could not be updated. Check console."
+    );
+
+    return;
+  }
+
+  tasks[index].completed = newStatus;
 
   renderTasks();
 
