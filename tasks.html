@@ -858,7 +858,7 @@ body{
 }  
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </head>
 
 <body>
@@ -1755,42 +1755,77 @@ async function confirmDelete(){
       `[data-task-id="${task.id}"]`
     );
 
-  /* Close confirmation dialog immediately */
-  closeDeleteDialog();
-
-  /* Start task throw animation */
-  if(taskElement){
-
-    taskElement.classList.add("throwing");
-
-    const animationOverlay =
-      document.getElementById(
-        "deleteAnimationOverlay"
-      );
-
-    const animation =
-      document.getElementById(
-        "deleteAnimation"
-      );
-
-    animationOverlay.classList.add("show");
-
-    animation.style.position = "fixed";
-
-    animation.style.left =
-      (window.innerWidth - 145) + "px";
-
-    animation.style.top =
-      (window.innerHeight - 145) + "px";
-
-    animation.stop();
-    animation.play();
-
+  if(!taskElement){
+    alert("Task element not found.");
+    return;
   }
 
-  /* Wait for throw animation */
+  /* Get task position */
+  const taskRect =
+    taskElement.getBoundingClientRect();
+
+  /* Close confirmation dialog */
+  closeDeleteDialog();
+
+  /* Get animation */
+  const overlay =
+    document.getElementById(
+      "deleteAnimationOverlay"
+    );
+
+  const animation =
+    document.getElementById(
+      "deleteAnimation"
+    );
+
+  /* Show dustbin */
+  overlay.classList.add("show");
+
+  /* Position dustbin at bottom-right */
+  overlay.style.left =
+    (window.innerWidth - 140) + "px";
+
+  overlay.style.top =
+    (window.innerHeight - 140) + "px";
+
+  overlay.style.right = "auto";
+  overlay.style.bottom = "auto";
+
+  /* Reset Lottie */
+  animation.stop();
+  animation.seek(0);
+
+  /* Calculate movement */
+  const startX = 0;
+  const startY = 0;
+
+  const targetX =
+    (window.innerWidth - 140) -
+    taskRect.left;
+
+  const targetY =
+    (window.innerHeight - 140) -
+    taskRect.top;
+
+  /* Animate task toward dustbin */
+  taskElement.style.transition =
+    "transform 0.75s cubic-bezier(.45,-0.1,.75,.25), opacity 0.75s ease";
+
+  taskElement.style.transform =
+    `translate(${targetX}px, ${targetY}px) rotate(15deg) scale(0.25)`;
+
+  taskElement.style.opacity = "0";
+
+  /* Start dustbin animation slightly later */
+  setTimeout(() => {
+
+    animation.play();
+
+  }, 450);
+
+  /* Wait for visual animation */
   await new Promise(
-    resolve => setTimeout(resolve, 700)
+    resolve => setTimeout(resolve, 800)
   );
 
   /* Delete from Supabase */
@@ -1809,18 +1844,11 @@ async function confirmDelete(){
       error
     );
 
-    /* Restore task if delete fails */
-    if(taskElement){
-      taskElement.classList.remove(
-        "throwing"
-      );
-    }
+    taskElement.style.transition = "none";
+    taskElement.style.transform = "";
+    taskElement.style.opacity = "";
 
-    document
-      .getElementById(
-        "deleteAnimationOverlay"
-      )
-      .classList.remove("show");
+    overlay.classList.remove("show");
 
     alert(
       "Task could not be deleted. Check console."
@@ -1829,7 +1857,7 @@ async function confirmDelete(){
     return;
   }
 
-  /* Remove task from local array */
+  /* Remove from local array */
   tasks.splice(
     deleteIndex,
     1
@@ -1837,12 +1865,8 @@ async function confirmDelete(){
 
   deleteIndex = null;
 
-  /* Hide delete animation */
-  document
-    .getElementById(
-      "deleteAnimationOverlay"
-    )
-    .classList.remove("show");
+  /* Hide animation */
+  overlay.classList.remove("show");
 
   /* Refresh task list */
   renderTasks();
