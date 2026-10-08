@@ -977,9 +977,7 @@ backdrop-filter:none;
 
       <div class="date" id="todayDate"></div>
 
-      <div class="avatar" id="avatar">
-        U
-      </div>
+     <div class="avatar" id="avatar"></div>
 
     </div>
 
@@ -2158,7 +2156,22 @@ async function loadTasks(){
     return;
 
   }
+/* ================= USER AVATAR ================= */
 
+const avatar =
+  document.getElementById("avatar");
+
+const userName =
+  session.user.user_metadata?.full_name ||
+  session.user.user_metadata?.name ||
+  session.user.email?.split("@")[0] ||
+  "User";
+
+avatar.textContent =
+  userName
+    .trim()
+    .charAt(0)
+    .toUpperCase();
 
   const {
     data,
