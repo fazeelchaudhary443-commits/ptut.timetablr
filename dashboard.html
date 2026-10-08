@@ -95,8 +95,12 @@ body{
   overflow:hidden;
 
   z-index:1001;
-}
 
+  height:100vh;
+  max-height:100vh;
+
+  overscroll-behavior:contain;
+}
 
 .brand{
   display:flex;
@@ -138,16 +142,21 @@ body{
   flex-direction:column;
   gap:5px;
 
-  overflow-y:auto;
-  overflow-x:hidden;
-
   padding:0 16px 20px;
 
   flex:1;
   min-height:0;
+  max-height:300px;
+  overflow-y:auto;
+  overflow-x:hidden;
 
   scrollbar-width:thin;
   scrollbar-color:rgba(148,163,184,.25) transparent;
+
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+
+  scroll-behavior:smooth;
 }
 
 .nav::-webkit-scrollbar{
@@ -166,6 +175,16 @@ body{
 .nav::-webkit-scrollbar-thumb:hover{
   background:rgba(148,163,184,.4);
 }
+  @media(min-width:751px){
+  .sidebar{
+    overscroll-behavior:contain;
+  }
+
+  .nav{
+    overscroll-behavior:contain;
+  }
+}
+
 .nav a{
   display:flex;
   align-items:center;
@@ -1697,7 +1716,54 @@ function closeMobileSidebar(){
 ========================================= */
 
 loadDashboard();
+/* =========================================
+   PREVENT PAGE SCROLL OVER SIDEBAR
+========================================= */
 
+const sidebar =
+  document.getElementById("sidebar");
+
+if(sidebar){
+
+  sidebar.addEventListener(
+    "wheel",
+    function(event){
+
+      const nav =
+        document.querySelector(".nav");
+
+      if(!nav){
+        event.preventDefault();
+        return;
+      }
+
+      const canScroll =
+        nav.scrollHeight > nav.clientHeight;
+
+      if(!canScroll){
+        event.preventDefault();
+        return;
+      }
+
+      const atTop =
+        nav.scrollTop <= 0;
+
+      const atBottom =
+        nav.scrollTop + nav.clientHeight >=
+        nav.scrollHeight - 1;
+
+      if(
+        (event.deltaY < 0 && atTop) ||
+        (event.deltaY > 0 && atBottom)
+      ){
+        event.preventDefault();
+      }
+
+    },
+    {passive:false}
+  );
+
+}
 </script>
 
 </body>
