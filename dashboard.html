@@ -80,22 +80,45 @@ body{
 /* =========================
    SIDEBAR
 ========================= */
-
 .sidebar{
   position:fixed;
   left:0;
   top:0;
   bottom:0;
   width:250px;
+
   background:var(--dark);
-  overflow-y:auto;
+
+  display:flex;
+  flex-direction:column;
+
+  overflow:hidden;
+
+  z-index:1001;
 }
 
+.sidebar::-webkit-scrollbar{
+  width:5px;
+}
+
+.sidebar::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+  background:rgba(148,163,184,.25);
+  border-radius:10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover{
+  background:rgba(148,163,184,.4);
+}
 .brand{
   display:flex;
   align-items:center;
   gap:11px;
   padding:0 10px 30px;
+  flex-shrink:0;
 }
 
 .brand-mark{
@@ -114,7 +137,6 @@ body{
   font-size:19px;
   font-weight:800;
 }
-
 .nav-title{
   color:#64748b;
   font-size:10px;
@@ -123,14 +145,42 @@ body{
   font-weight:700;
   padding:0 12px;
   margin-bottom:9px;
+  flex-shrink:0;
 }
 
 .nav{
   display:flex;
   flex-direction:column;
   gap:5px;
+
+  overflow-y:auto;
+  overflow-x:hidden;
+
+  padding:0 16px 20px;
+
+  flex:1;
+  min-height:0;
+
+  scrollbar-width:thin;
+  scrollbar-color:rgba(148,163,184,.25) transparent;
 }
 
+.nav::-webkit-scrollbar{
+  width:5px;
+}
+
+.nav::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+.nav::-webkit-scrollbar-thumb{
+  background:rgba(148,163,184,.25);
+  border-radius:10px;
+}
+
+.nav::-webkit-scrollbar-thumb:hover{
+  background:rgba(148,163,184,.4);
+}
 .nav a{
   display:flex;
   align-items:center;
@@ -160,10 +210,10 @@ body{
 }
 
 .sidebar-bottom{
-  position:absolute;
-  left:16px;
-  right:16px;
-  bottom:20px;
+  padding:16px;
+  flex-shrink:0;
+  margin-top:0;
+  background:var(--dark);
 }
 
 .logout{
