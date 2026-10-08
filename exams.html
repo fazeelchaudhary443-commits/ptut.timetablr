@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Exams — PTUT Hub</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:#f8fafc;
+  color:#0f172a;
+  min-height:100vh;
+}
+
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  width:250px;
+  height:100vh;
+
+  background:#0f172a;
+  color:white;
+
+  padding:26px 18px;
+
+  display:flex;
+  flex-direction:column;
+
+  z-index:1000;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:11px;
+
+  padding:0 10px;
+  margin-bottom:38px;
+}
+
+.logo-icon{
+  width:38px;
+  height:38px;
+
+  border-radius:11px;
+
+  background:linear-gradient(
+    135deg,
+    #22d3ee,
+    #3b82f6
+  );
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:white;
+  font-size:17px;
+  font-weight:800;
+
+  box-shadow:
+    0 8px 25px rgba(34,211,238,.25);
+}
+
+.logo-text{
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:-.4px;
+}
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.nav-item{
+  height:46px;
+
+  display:flex;
+  align-items:center;
+  gap:13px;
+
+  padding:0 14px;
+
+  border-radius:12px;
+
+  color:#94a3b8;
+  text-decoration:none;
+
+  font-size:14px;
+  font-weight:600;
+
+  transition:.2s ease;
+}
+
+.nav-item:hover{
+  background:rgba(255,255,255,.06);
+  color:white;
+}
+
+.nav-item.active{
+  background:rgba(59,130,246,.16);
+  color:#60a5fa;
+}
+
+.nav-icon{
+  width:20px;
+  text-align:center;
+  font-size:17px;
+}
+
+.sidebar-bottom{
+  margin-top:auto;
+}
+
+.logout{
+  width:100%;
+  border:none;
+  background:rgba(255,255,255,.05);
+
+  color:#94a3b8;
+
+  height:45px;
+  border-radius:11px;
+
+  font-family:inherit;
+  font-size:14px;
+  font-weight:600;
+
+  cursor:pointer;
+
+  transition:.2s ease;
+}
+
+.logout:hover{
+  background:rgba(239,68,68,.1);
+  color:#f87171;
+}
+
+
+/* ================= MAIN ================= */
+
+.main{
+  margin-left:250px;
+  min-height:100vh;
+}
+
+
+/* ================= TOPBAR ================= */
+
+.topbar{
+  height:76px;
+
+  background:white;
+
+  border-bottom:1px solid #e2e8f0;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:0 34px;
+}
+
+.page-title{
+  font-size:15px;
+  font-weight:700;
+  color:#334155;
+}
+
+.top-right{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.date-text{
+  font-size:13px;
+  color:#64748b;
+}
+
+.avatar{
+  width:38px;
+  height:38px;
+
+  border-radius:50%;
+
+  background:linear-gradient(
+    135deg,
+    #22d3ee,
+    #3b82f6
+  );
+
+  color:white;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:14px;
+  font-weight:800;
+}
+
+
+/* ================= CONTENT ================= */
+
+.content{
+  padding:34px;
+  max-width:1400px;
+  margin:auto;
+}
+
+.page-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+
+  margin-bottom:30px;
+}
+
+.heading-left h1{
+  font-size:29px;
+  font-weight:800;
+  letter-spacing:-.8px;
+  margin-bottom:7px;
+}
+
+.heading-left p{
+  font-size:14px;
+  color:#64748b;
+}
+
+.add-exam-btn{
+  border:none;
+
+  background:#0f172a;
+  color:white;
+
+  height:44px;
+  padding:0 18px;
+
+  border-radius:11px;
+
+  font-family:inherit;
+  font-size:13px;
+  font-weight:700;
+
+  cursor:pointer;
+
+  transition:.2s ease;
+}
+
+.add-exam-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 20px rgba(15,23,42,.16);
+}
+
+
+/* ================= STATS ================= */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+
+  margin-bottom:32px;
+}
+
+.stat-card{
+  background:white;
+
+  border:1px solid #e2e8f0;
+
+  border-radius:16px;
+
+  padding:20px;
+
+  transition:.2s ease;
+}
+
+.stat-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 30px rgba(15,23,42,.06);
+}
+
+.stat-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  margin-bottom:14px;
+}
+
+.stat-label{
+  font-size:12px;
+  font-weight:600;
+  color:#64748b;
+}
+
+.stat-icon{
+  width:34px;
+  height:34px;
+
+  border-radius:10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#f1f5f9;
+
+  font-size:15px;
+}
+
+.stat-number{
+  font-size:25px;
+  font-weight:800;
+  letter-spacing:-.5px;
+}
+
+
+/* ================= SECTION ================= */
+
+.section{
+  margin-bottom:34px;
+}
+
+.section-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  margin-bottom:15px;
+}
+
+.section-title{
+  font-size:17px;
+  font-weight:800;
+}
+
+.section-count{
+  font-size:12px;
+  color:#64748b;
+}
+
+
+/* ================= EXAM GRID ================= */
+
+.exam-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+
+/* ================= EXAM CARD ================= */
+
+.exam-card{
+  position:relative;
+
+  background:white;
+
+  border:1px solid #e2e8f0;
+
+  border-radius:17px;
+
+  padding:22px;
+
+  overflow:hidden;
+
+  transition:.25s ease;
+}
+
+.exam-card::before{
+  content:"";
+
+  position:absolute;
+
+  left:0;
+  top:0;
+
+  width:4px;
+  height:100%;
+
+  background:linear-gradient(
+    180deg,
+    #22d3ee,
+    #3b82f6
+  );
+}
+
+.exam-card:hover{
+  transform:translateY(-3px);
+
+  box-shadow:
+    0 14px 35px rgba(15,23,42,.08);
+}
+
+.exam-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  margin-bottom:18px;
+}
+
+.exam-badge{
+  display:inline-flex;
+  align-items:center;
+
+  padding:6px 9px;
+
+  border-radius:7px;
+
+  background:#eff6ff;
+  color:#2563eb;
+
+  font-size:10px;
+  font-weight:800;
+
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+
+.exam-menu{
+  width:30px;
+  height:30px;
+
+  border:none;
+  background:#f8fafc;
+
+  border-radius:8px;
+
+  color:#64748b;
+
+  cursor:pointer;
+
+  font-size:17px;
+}
+
+.exam-subject{
+  font-size:18px;
+  font-weight:800;
+
+  margin-bottom:6px;
+}
+
+.exam-code{
+  font-size:11px;
+  color:#94a3b8;
+
+  margin-bottom:19px;
+}
+
+.exam-details{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+
+  margin-bottom:19px;
+}
+
+.detail{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  font-size:12px;
+  color:#64748b;
+}
+
+.detail-icon{
+  font-size:14px;
+}
+
+.countdown{
+  border-top:1px solid #eef2f7;
+
+  padding-top:15px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.countdown-label{
+  font-size:11px;
+  color:#94a3b8;
+  font-weight:600;
+}
+
+.countdown-value{
+  font-size:13px;
+  color:#2563eb;
+  font-weight:800;
+}
+
+
+/* ================= PAST EXAMS ================= */
+
+.past-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+.past-card{
+  background:white;
+
+  border:1px solid #e2e8f0;
+
+  border-radius:16px;
+
+  padding:20px;
+
+  opacity:.78;
+}
+
+.past-card .exam-badge{
+  background:#f1f5f9;
+  color:#64748b;
+}
+
+.past-card .countdown-value{
+  color:#64748b;
+}
+
+
+/* ================= EMPTY STATE ================= */
+
+.empty-state{
+  background:white;
+
+  border:1px dashed #cbd5e1;
+
+  border-radius:16px;
+
+  padding:50px 20px;
+
+  text-align:center;
+
+  color:#64748b;
+}
+
+.empty-icon{
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+.empty-state h3{
+  color:#334155;
+  font-size:15px;
+  margin-bottom:5px;
+}
+
+.empty-state p{
+  font-size:12px;
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1100px){
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .exam-grid,
+  .past-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+}
+
+@media(max-width:800px){
+
+  .sidebar{
+    width:72px;
+    padding:22px 10px;
+  }
+
+  .logo{
+    justify-content:center;
+    padding:0;
+  }
+
+  .logo-text{
+    display:none;
+  }
+
+  .nav-item{
+    justify-content:center;
+    padding:0;
+  }
+
+  .nav-item span:not(.nav-icon){
+    display:none;
+  }
+
+  .sidebar-bottom{
+    display:flex;
+    justify-content:center;
+  }
+
+  .logout{
+    font-size:0;
+  }
+
+  .logout::after{
+    content:"↪";
+    font-size:18px;
+  }
+
+  .main{
+    margin-left:72px;
+  }
+
+  .content{
+    padding:24px 18px;
+  }
+
+  .topbar{
+    padding:0 18px;
+  }
+
+  .date-text{
+    display:none;
+  }
+
+}
+
+@media(max-width:600px){
+
+  .page-heading{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:16px;
+  }
+
+  .heading-left h1{
+    font-size:25px;
+  }
+
+  .add-exam-btn{
+    width:100%;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+
+  .exam-grid,
+  .past-grid{
+    grid-template-columns:1fr;
+  }
+
+  .stat-card{
+    padding:16px;
+  }
+
+  .stat-number{
+    font-size:21px;
+  }
+
+}
+</style>
+</head>
+
+
+<body>
+
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+  <div class="logo">
+
+    <div class="logo-icon">
+      P
+    </div>
+
+    <div class="logo-text">
+      PTUT Hub
+    </div>
+
+  </div>
+
+
+  <nav class="nav">
+
+    <a href="dashboard.html" class="nav-item">
+
+      <span class="nav-icon">⌂</span>
+      <span>Dashboard</span>
+
+    </a>
+
+
+    <a href="timetable.html" class="nav-item">
+
+      <span class="nav-icon">▦</span>
+      <span>Timetable</span>
+
+    </a>
+
+
+    <a href="tasks.html" class="nav-item">
+
+      <span class="nav-icon">✓</span>
+      <span>Tasks</span>
+
+    </a>
+
+
+    <a href="exams.html" class="nav-item active">
+
+      <span class="nav-icon">▣</span>
+      <span>Exams</span>
+
+    </a>
+
+
+    <a href="#" class="nav-item">
+
+      <span class="nav-icon">◉</span>
+      <span>Announcements</span>
+
+    </a>
+
+
+    <a href="#" class="nav-item">
+
+      <span class="nav-icon">⚙</span>
+      <span>Settings</span>
+
+    </a>
+
+  </nav>
+
+
+  <div class="sidebar-bottom">
+
+    <button class="logout">
+      Logout
+    </button>
+
+  </div>
+
+</aside>
+
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main">
+
+
+  <!-- ================= TOPBAR ================= -->
+
+  <header class="topbar">
+
+    <div class="page-title">
+      Exams
+    </div>
+
+    <div class="top-right">
+
+      <div class="date-text">
+        Wednesday, October 8, 2026
+      </div>
+
+      <div class="avatar">
+        A
+      </div>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- ================= CONTENT ================= -->
+
+  <div class="content">
+
+
+    <!-- ================= HEADING ================= -->
+
+    <div class="page-heading">
+
+      <div class="heading-left">
+
+        <h1>
+          My Exams
+        </h1>
+
+        <p>
+          Keep track of your upcoming and past examinations.
+        </p>
+
+      </div>
+
+
+      <button class="add-exam-btn">
+        + Add Exam
+      </button>
+
+    </div>
+
+
+
+    <!-- ================= STATS ================= -->
+
+    <div class="stats">
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-label">
+            Total Exams
+          </div>
+
+          <div class="stat-icon">
+            📚
+          </div>
+
+        </div>
+
+        <div class="stat-number">
+          5
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-label">
+            Upcoming
+          </div>
+
+          <div class="stat-icon">
+            📅
+          </div>
+
+        </div>
+
+        <div class="stat-number">
+          3
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-label">
+            This Week
+          </div>
+
+          <div class="stat-icon">
+            ⏳
+          </div>
+
+        </div>
+
+        <div class="stat-number">
+          2
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-label">
+            Completed
+          </div>
+
+          <div class="stat-icon">
+            ✓
+          </div>
+
+        </div>
+
+        <div class="stat-number">
+          2
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ================= UPCOMING ================= -->
+
+    <section class="section">
+
+      <div class="section-header">
+
+        <div class="section-title">
+          Upcoming Exams
+        </div>
+
+        <div class="section-count">
+          3 exams
+        </div>
+
+      </div>
+
+
+      <div class="exam-grid">
+
+
+        <!-- EXAM 1 -->
+
+        <div class="exam-card">
+
+          <div class="exam-top">
+
+            <span class="exam-badge">
+              Midterm
+            </span>
+
+            <button class="exam-menu">
+              ⋮
+            </button>
+
+          </div>
+
+
+          <div class="exam-subject">
+            Programming Fundamentals
+          </div>
+
+          <div class="exam-code">
+            SE-101
+          </div>
+
+
+          <div class="exam-details">
+
+            <div class="detail">
+              <span class="detail-icon">📅</span>
+              <span>Oct 14, 2026</span>
+            </div>
+
+            <div class="detail">
+              <span class="detail-icon">⏰</span>
+              <span>10:00 AM</span>
+            </div>
+
+            <div class="detail">
+              <span class="detail-icon">📍</span>
+              <span>Room 204</span>
+            </div>
+
+            <div class="detail">
+              <span class="detail-icon">⏱</span>
+              <span>2 Hours</span>
+            </div>
+
+          </div>
+
+
+          <div class="countdown">
+
+            <span class="countdown-label">
+              Days Remaining
+            </span>
+
+            <span class="countdown-value">
+              6 Days
+            </span>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- EXAM 2 -->
+
+        <div class="exam-card">
+
+          <div class="exam-top">
+
+            <span class="exam-badge">
+              Quiz
+            </span>
+
+            <button class="exam-menu">
+              ⋮
+            </button>
+
+          </div>
+
+
+          <div class="exam-subject">
+            Engineering Mathematics
+          </div>
+
+          <div class="exam-code">
+            MTH-101
+          </div>
+
+
+          <div class="exam-details">
+
+            <div class="detail">
+              <span class="detail-icon">📅</span>
+              <span>Oct 16, 2026</span>
+            </div>
+
+            <div class="detail">
+              <span class="detail-icon">⏰</span>
+              <span>9:00 AM</span>
+            </div>
+
+            <div class="detail">
+              <span class="detail-icon">📍</span>
+              <span>Room 112</span>
+            </div>
+
+            <div class="detail">
+              <span class="detail-icon">⏱</span>
+              <span>1 Hour</span>
+            </div>
+
+          </div>
+
+
+          <div class="countdown">
+
+            <span class="countdown-label">
+              Days Remaining
+            </span>
+
+            <span class="countdown-value">
+              8 Days
+            </span>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- EXAM 3 -->
+
+        <div class="exam-card">
+
+          <div class="exam-top">
+
+            <span class="exam-badge">
+              Final
+            </span>
+
+            <button class="exam-menu">
+              ⋮
+            </button>
+
+          </div>
+
+
+          <div class="exam-subject">
+            Computer Science Fundamentals
+          </div>
+
+          <div class="exam-code">
+            CS-105
+          </div>
+
+
+          <div class="exam-details">
+
+            <div class="detail">
+              <span class="detail-icon">📅</span>
+              <span>Oct 22, 2026</span>
+            </div>
+
+            <div class="detail">
+              <span class="detail-icon">⏰</span>
+              <span>11:00 AM</span>
+            </div>
+
+            <div class="detail">
+              <span class="detail-icon">📍</span>
+              <span>Room 301</span>
+            </div>
+
+            <div class="detail">
+              <span class="detail-icon">⏱</span>
+              <span>2 Hours</span>
+            </div>
+
+          </div>
+
+
+          <div class="countdown">
+
+            <span class="countdown-label">
+              Days Remaining
+            </span>
+
+            <span class="countdown-value">
+              14 Days
+            </span>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ================= PAST EXAMS ================= -->
+
+    <section class="section">
+
+      <div class="section-header">
+
+        <div class="section-title">
+          Past Exams
+        </div>
+
+        <div class="section-count">
+          2 completed
+        </div>
+
+      </div>
+
+
+      <div class="past-grid">
+
+
+        <div class="past-card">
+
+          <div class="exam-top">
+
+            <span class="exam-badge">
+              Quiz
+            </span>
+
+          </div>
+
+          <div class="exam-subject">
+            Applied Physics
+          </div>
+
+          <div class="exam-code">
+            PHY-101
+          </div>
+
+          <div class="countdown">
+
+            <span class="countdown-label">
+              Exam Date
+            </span>
+
+            <span class="countdown-value">
+              Sep 28, 2026
+            </span>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="past-card">
+
+          <div class="exam-top">
+
+            <span class="exam-badge">
+              Midterm
+            </span>
+
+          </div>
+
+          <div class="exam-subject">
+            Communication Skills
+          </div>
+
+          <div class="exam-code">
+            ENG-101
+          </div>
+
+          <div class="countdown">
+
+            <span class="countdown-label">
+              Exam Date
+            </span>
+
+            <span class="countdown-value">
+              Oct 2, 2026
+            </span>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+
+  </div>
+
+</main>
+
+</body>
+</html>
