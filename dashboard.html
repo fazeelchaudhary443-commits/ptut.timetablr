@@ -97,22 +97,7 @@ body{
   z-index:1001;
 }
 
-.sidebar::-webkit-scrollbar{
-  width:5px;
-}
 
-.sidebar::-webkit-scrollbar-track{
-  background:transparent;
-}
-
-.sidebar::-webkit-scrollbar-thumb{
-  background:rgba(148,163,184,.25);
-  border-radius:10px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover{
-  background:rgba(148,163,184,.4);
-}
 .brand{
   display:flex;
   align-items:center;
@@ -694,7 +679,7 @@ body{
 @media(max-width:750px){
 
   .sidebar{
-    display:block;
+    display:flex;
     position:fixed;
     left:0;
     top:0;
