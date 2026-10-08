@@ -646,7 +646,43 @@ body{
 @media(max-width:750px){
 
   .sidebar{
-    display:none;
+    display:block;
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+
+    width:250px;
+
+    transform:translateX(-100%);
+    transition:transform .28s ease;
+
+    z-index:1001;
+  }
+
+  .sidebar.mobile-open{
+    transform:translateX(0);
+  }
+
+  .sidebar-overlay{
+    position:fixed;
+    inset:0;
+
+    background:rgba(15,23,42,.38);
+    backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px);
+
+    opacity:0;
+    visibility:hidden;
+
+    transition:.25s ease;
+
+    z-index:1000;
+  }
+
+  .sidebar-overlay.show{
+    opacity:1;
+    visibility:visible;
   }
 
   .main{
@@ -657,10 +693,15 @@ body{
     height:64px;
     background:var(--dark);
     color:white;
+
     display:flex;
     align-items:center;
     justify-content:space-between;
+
     padding:0 18px;
+
+    position:relative;
+    z-index:900;
   }
 
   .mobile-brand{
@@ -669,10 +710,27 @@ body{
   }
 
   .mobile-menu{
-    border:none;
-    background:none;
+    width:40px;
+    height:40px;
+
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;
+
+    background:rgba(255,255,255,.06);
     color:white;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
     font-size:21px;
+    cursor:pointer;
+
+    transition:.2s ease;
+  }
+
+  .mobile-menu:hover{
+    background:rgba(255,255,255,.12);
   }
 
   .topbar{
@@ -697,8 +755,7 @@ body{
   }
 
 }
-
-@media(max-width:500px){
+  @media(max-width:500px){
 
   .stats{
     gap:10px;
@@ -734,7 +791,11 @@ body{
 <div class="loading" id="loading">
   <div class="loader"></div>
 </div>
-
+<div
+  class="sidebar-overlay"
+  id="sidebarOverlay"
+  onclick="closeMobileSidebar()"
+></div>
 
 <!-- MOBILE HEADER -->
 
@@ -744,16 +805,21 @@ body{
     PTUT Hub
   </div>
 
-  <button class="mobile-menu">
-    ☰
-  </button>
+ <button
+  class="mobile-menu"
+  id="mobileMenu"
+  onclick="toggleMobileSidebar()"
+  aria-label="Open navigation"
+>
+  ☰
+</button>
 
 </div>
 
 
 <!-- SIDEBAR -->
 
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
 
   <div class="brand">
 
@@ -1563,7 +1629,35 @@ async function logout(){
   window.location.href="index.html";
 
 }
+/* =========================================
+   MOBILE SIDEBAR
+========================================= */
 
+function toggleMobileSidebar(){
+
+  const sidebar =
+    document.getElementById("sidebar");
+
+  const overlay =
+    document.getElementById("sidebarOverlay");
+
+  sidebar.classList.toggle("mobile-open");
+  overlay.classList.toggle("show");
+
+}
+
+function closeMobileSidebar(){
+
+  const sidebar =
+    document.getElementById("sidebar");
+
+  const overlay =
+    document.getElementById("sidebarOverlay");
+
+  sidebar.classList.remove("mobile-open");
+  overlay.classList.remove("show");
+
+}
 
 /* =========================================
    START
