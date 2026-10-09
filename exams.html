@@ -635,6 +635,43 @@ a{
   color:var(--primary);
 }
 
+/* ================= DELETE EXAM BUTTON ================= */
+
+.exam-card-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.delete-exam-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:9px 11px;
+  border:1px solid #fecaca;
+  border-radius:7px;
+  background:#fff;
+  color:#dc2626;
+  font-size:10px;
+  font-weight:600;
+  transition:background .2s ease,border-color .2s ease;
+}
+
+.delete-exam-btn:hover{
+  background:#fef2f2;
+  border-color:#f87171;
+}
+
+.delete-exam-btn:disabled{
+  opacity:.6;
+  cursor:wait;
+}
+
+.exam-card-actions .exam-action{
+  white-space:nowrap;
+}
 /* ================= EMPTY STATE ================= */
 
 .empty-state{
@@ -1258,12 +1295,27 @@ a{
 
           </div>
 
-          <div class="exam-card-footer">
-            <span class="exam-type">Written Examination</span>
-            <button class="exam-action" type="button">
-              View Details <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </div>
+<div class="exam-card-footer">
+  <span class="exam-type">
+    ${past ? 'Past Examination' : 'Academic Exam'}
+  </span>
+
+  <div class="exam-card-actions">
+    <button class="exam-action view-exam-btn"
+            type="button"
+            data-exam-id="${escapeHTML(exam.id)}">
+      View Details <i class="fa-solid fa-arrow-right"></i>
+    </button>
+
+    ${currentUser && exam.created_by === currentUser.id ? `
+      <button class="delete-exam-btn"
+              type="button"
+              data-delete-exam-id="${escapeHTML(exam.id)}">
+        <i class="fa-solid fa-trash"></i> Delete
+      </button>
+    ` : ''}
+  </div>
+</div>
 
         </article>
 
@@ -1515,6 +1567,7 @@ const saveBtn = $('saveExamBtn');
 const notice = $('examNotice');
 
 let exams = [];
+let currentUser = null;
 let noticeTimer;
 
 /* ================= HELPERS ================= */
@@ -1706,7 +1759,7 @@ async function loadExams() {
   try {
     const { data, error } = await db
       .from('exams')
-      .select('id, exam_title, exam_date, start_time, end_time, subject_id, section_id, room_id, created_at')
+      .select('id, exam_title, exam_date, start_time, end_time, subject_id, section_id, room_id, created_at, created_by')
       .order('exam_date', { ascending: true });
 
     if (error) throw error;
@@ -1772,6 +1825,7 @@ async function loadExams() {
   }
 }
 
+
 /* ================= SAVE EXAM ================= */
 
 form.addEventListener('submit', async (event) => {
@@ -1801,14 +1855,27 @@ form.addEventListener('submit', async (event) => {
   saveBtn.innerHTML =
     '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
 
-  const record = {
-    exam_title: examTitle,
-    exam_date: examDate,
-    start_time: startTime || null,
-    end_time: endTime || null
-  };
-
   try {
+    const { data: { user }, error: userError } =
+      await db.auth.getUser();
+
+    if (userError) throw userError;
+
+    if (!user) {
+      notify('Please log in before creating an exam.', 'error');
+      return;
+    }
+
+    currentUser = user;
+
+    const record = {
+      exam_title: examTitle,
+      exam_date: examDate,
+      start_time: startTime || null,
+      end_time: endTime || null,
+      created_by: user.id
+    };
+
     const { error } = await db
       .from('exams')
       .insert(record);
@@ -1824,7 +1891,7 @@ form.addEventListener('submit', async (event) => {
     console.error('Could not save exam:', error);
 
     notify(
-      error.message || 'Could not save exam. Check Supabase RLS policies.',
+      error.message || 'Could not save exam.',
       'error'
     );
   } finally {
@@ -1833,7 +1900,6 @@ form.addEventListener('submit', async (event) => {
       '<i class="fa-solid fa-floppy-disk"></i> Save Exam';
   }
 });
-
 /* ================= BUTTONS ================= */
 
 $('addExamBtn').addEventListener('click', openModal);
@@ -1873,6 +1939,61 @@ document.addEventListener('click', (event) => {
   );
 });
 
+/* ================= DELETE OWN EXAM ================= */
+
+document.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-delete-exam-id]');
+
+  if (!button) return;
+
+  const examId = button.dataset.deleteExamId;
+  const exam = exams.find(item => item.id === examId);
+
+  if (!exam) {
+    notify('Exam could not be found.', 'error');
+    return;
+  }
+
+  // Frontend check; Supabase RLS is the actual security layer.
+  if (!currentUser || exam.created_by !== currentUser.id) {
+    notify('You can only delete exams you created.', 'error');
+    return;
+  }
+
+  if (!confirm(`Delete "${exam.exam_title}" permanently?`)) {
+    return;
+  }
+
+  button.disabled = true;
+  button.innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin"></i> Deleting...';
+
+  try {
+    const { data, error } = await db
+      .from('exams')
+      .delete()
+      .eq('id', examId)
+      .select('id');
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      throw new Error(
+        'Exam was not deleted. Check your login and Supabase DELETE policy.'
+      );
+    }
+
+    notify('Exam deleted successfully!', 'success');
+    await loadExams();
+
+  } catch (error) {
+    console.error('Delete exam error:', error);
+    notify(error.message || 'Could not delete exam.', 'error');
+    button.disabled = false;
+    button.innerHTML =
+      '<i class="fa-solid fa-trash"></i> Delete';
+  }
+});
 /* ================= DATE & LOGOUT ================= */
 
 $('todayDate').textContent = new Date().toLocaleDateString('en-US', {
@@ -1897,9 +2018,32 @@ $('logoutBtn').addEventListener('click', async () => {
   }
 });
 
+
 /* ================= INITIALIZE ================= */
 
-loadExams();
+async function initializeExamsPage() {
+  try {
+    const { data: { session }, error } =
+      await db.auth.getSession();
+
+    if (error) throw error;
+
+    if (!session) {
+      currentUser = null;
+      notify('Please log in to access your exams.', 'error');
+      return;
+    }
+
+    currentUser = session.user;
+    await loadExams();
+
+  } catch (error) {
+    console.error('Initialization error:', error);
+    notify('Could not verify your login session.', 'error');
+  }
+}
+
+initializeExamsPage();
 </script>
 </body>
 </html>
