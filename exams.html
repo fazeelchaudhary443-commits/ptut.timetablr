@@ -822,6 +822,172 @@ a{
     height:31px;
   }
 }
+  
+/* ================= ADD EXAM MODAL ================= */
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  z-index:2000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(15,23,42,.55);
+  backdrop-filter:blur(4px);
+}
+
+.modal-overlay.show{
+  display:flex;
+}
+
+.exam-modal{
+  width:100%;
+  max-width:520px;
+  max-height:90vh;
+  overflow-y:auto;
+  padding:26px;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 25px 70px rgba(15,23,42,.2);
+  animation:examModalIn .2s ease;
+}
+
+@keyframes examModalIn{
+  from{opacity:0;transform:translateY(10px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:22px;
+}
+
+.modal-header h2{
+  font-size:20px;
+  font-weight:800;
+}
+
+.modal-close{
+  width:35px;
+  height:35px;
+  border:0;
+  border-radius:9px;
+  background:#f1f5f9;
+  color:#475569;
+}
+
+.modal-close:hover{
+  background:#e2e8f0;
+}
+
+.exam-form{
+  display:grid;
+  gap:16px;
+}
+
+.form-field{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.form-field label{
+  font-size:12px;
+  font-weight:600;
+  color:#334155;
+}
+
+.form-field input{
+  width:100%;
+  min-height:43px;
+  padding:10px 12px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  outline:none;
+  color:#0f172a;
+  background:#fff;
+}
+
+.form-field input:focus{
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.1);
+}
+
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:13px;
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:7px;
+}
+
+.secondary-btn{
+  padding:11px 16px;
+  border:1px solid #e2e8f0;
+  border-radius:8px;
+  background:#fff;
+  color:#334155;
+  font-size:12px;
+  font-weight:600;
+}
+
+.secondary-btn:hover{
+  background:#f8fafc;
+}
+
+.primary-btn:disabled{
+  opacity:.65;
+  cursor:wait;
+  transform:none;
+}
+
+.exam-notice{
+  position:fixed;
+  right:22px;
+  bottom:22px;
+  z-index:3000;
+  max-width:calc(100vw - 44px);
+  padding:14px 18px;
+  border-radius:10px;
+  background:#0f172a;
+  color:white;
+  font-size:13px;
+  box-shadow:0 10px 30px rgba(15,23,42,.2);
+}
+
+.exam-notice.error{
+  background:#991b1b;
+}
+
+.exam-notice.success{
+  background:#166534;
+}
+
+.exam-loading{
+  grid-column:1/-1;
+  padding:35px 20px;
+  border:1px dashed #cbd5e1;
+  border-radius:12px;
+  text-align:center;
+  color:#64748b;
+  background:#fff;
+  font-size:13px;
+}
+
+@media(max-width:500px){
+  .exam-modal{padding:20px}
+  .form-row{grid-template-columns:1fr}
+  .modal-actions>*{flex:1}
+}
 </style>
 </head>
 
@@ -1262,29 +1428,478 @@ a{
 
 </main>
 
-<!-- ================= BASIC PAGE SCRIPT ================= -->
+<!-- ================= ADD EXAM MODAL ================= -->
+
+<div class="modal-overlay" id="examModal" aria-hidden="true">
+  <div class="exam-modal" role="dialog" aria-modal="true"
+       aria-labelledby="examModalTitle">
+
+    <div class="modal-header">
+      <h2 id="examModalTitle">Add New Exam</h2>
+      <button class="modal-close" id="closeExamModal"
+              type="button" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form class="exam-form" id="examForm">
+      <div class="form-field">
+        <label for="examTitleInput">Exam Title *</label>
+        <input id="examTitleInput" name="exam_title"
+               type="text" maxlength="150"
+               placeholder="e.g. Programming Fundamentals"
+               required>
+      </div>
+
+      <div class="form-field">
+        <label for="examDateInput">Exam Date *</label>
+        <input id="examDateInput" name="exam_date"
+               type="date" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="examStartInput">Start Time</label>
+          <input id="examStartInput" name="start_time"
+                 type="time">
+        </div>
+
+        <div class="form-field">
+          <label for="examEndInput">End Time</label>
+          <input id="examEndInput" name="end_time"
+                 type="time">
+        </div>
+      </div>
+
+      <p style="font-size:11px;color:#64748b;line-height:1.6">
+        Subject, section and room selection will be connected
+        after confirming the related table columns.
+      </p>
+
+      <div class="modal-actions">
+        <button class="secondary-btn" id="cancelExamBtn"
+                type="button">Cancel</button>
+        <button class="primary-btn" id="saveExamBtn"
+                type="submit">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Save Exam
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="examNotice" class="exam-notice" role="status"
+     aria-live="polite" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-/* Dynamic date */
+/* ================= SUPABASE CONFIG ================= */
 
-const dateElement = document.getElementById('todayDate');
+const SUPABASE_URL = 'https://owiakeoybapbrfrmhcik.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_KxTVXqabaSm4BXRzqtUAeA_FHt8MPf-';
 
-if(dateElement){
-  dateElement.textContent = new Date().toLocaleDateString('en-US',{
-    weekday:'long',
-    year:'numeric',
-    month:'long',
-    day:'numeric'
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+/* ================= PAGE ELEMENTS ================= */
+
+const $ = (id) => document.getElementById(id);
+
+const modal = $('examModal');
+const form = $('examForm');
+const saveBtn = $('saveExamBtn');
+const notice = $('examNotice');
+
+let exams = [];
+let noticeTimer;
+
+/* ================= HELPERS ================= */
+
+function escapeHTML(value = '') {
+  return String(value).replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[char]);
+}
+
+function localDateString(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function formatDate(date) {
+  if (!date) return 'Not specified';
+
+  const parsed = new Date(`${date}T00:00:00`);
+
+  if (Number.isNaN(parsed.getTime())) return date;
+
+  return parsed.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
   });
 }
 
-/*
-  UI BASE ONLY:
-  Avatar, exam data, add-exam actions and logout
-  are not connected to Supabase in this version.
-  They can be connected in the next development task.
-*/
-</script>
+function formatTime(time) {
+  if (!time) return 'To be confirmed';
 
+  const parts = time.split(':');
+  const date = new Date();
+
+  date.setHours(Number(parts[0]), Number(parts[1]), 0, 0);
+
+  return date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit'
+  });
+}
+
+function notify(message, type = 'success') {
+  clearTimeout(noticeTimer);
+
+  notice.textContent = message;
+  notice.className = `exam-notice ${type}`;
+  notice.hidden = false;
+
+  noticeTimer = setTimeout(() => {
+    notice.hidden = true;
+  }, 4000);
+}
+
+function openModal() {
+  form.reset();
+  $('examDateInput').min = localDateString();
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+  setTimeout(() => $('examTitleInput').focus(), 50);
+}
+
+function closeModal() {
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function setLoading(container, message) {
+  container.innerHTML =
+    `<div class="exam-loading">${escapeHTML(message)}</div>`;
+}
+
+/* ================= EXAM STATUS ================= */
+
+function isPast(exam) {
+  return exam.exam_date < localDateString();
+}
+
+function isThisWeek(exam) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const end = new Date(today);
+  end.setDate(end.getDate() + 7);
+
+  const examDate = new Date(`${exam.exam_date}T00:00:00`);
+
+  return examDate >= today && examDate < end;
+}
+
+/* ================= EXAM CARD ================= */
+
+function renderExamCard(exam, past = false) {
+  const colors = ['blue', 'purple', 'green', 'orange'];
+  const icons = [
+    'fa-file-lines',
+    'fa-code',
+    'fa-calculator',
+    'fa-book-open'
+  ];
+
+  const index = Math.abs(
+    [...String(exam.id || exam.exam_title)]
+      .reduce((sum, char) => sum + char.charCodeAt(0), 0)
+  ) % colors.length;
+
+  const color = colors[index];
+  const icon = icons[index];
+
+  const timeText = exam.start_time
+    ? `${formatTime(exam.start_time)}${exam.end_time ? ' – ' + formatTime(exam.end_time) : ''}`
+    : 'To be confirmed';
+
+  return `
+    <article class="exam-card" data-exam-id="${escapeHTML(exam.id)}">
+      <div class="exam-card-top">
+        <div class="subject-icon ${color}">
+          <i class="fa-solid ${icon}"></i>
+        </div>
+
+        <span class="status-badge ${past ? 'completed' : (isThisWeek(exam) ? 'soon' : 'upcoming')}">
+          <i class="fa-solid ${past ? 'fa-check' : 'fa-calendar'}"></i>
+          ${past ? 'Completed' : (isThisWeek(exam) ? 'This Week' : 'Upcoming')}
+        </span>
+      </div>
+
+      <h3 class="exam-title">${escapeHTML(exam.exam_title)}</h3>
+      <p class="exam-code">${past ? 'Past Examination' : 'Scheduled Examination'}</p>
+
+      <div class="exam-details">
+        <div class="exam-detail">
+          <i class="fa-regular fa-calendar"></i>
+          <span><strong>Date:</strong> ${escapeHTML(formatDate(exam.exam_date))}</span>
+        </div>
+
+        <div class="exam-detail">
+          <i class="fa-regular fa-clock"></i>
+          <span><strong>Time:</strong> ${escapeHTML(timeText)}</span>
+        </div>
+
+        <div class="exam-detail">
+          <i class="fa-solid fa-location-dot"></i>
+          <span><strong>Venue:</strong> To be confirmed</span>
+        </div>
+      </div>
+
+      <div class="exam-card-footer">
+        <span class="exam-type">${past ? 'Past Examination' : 'Academic Exam'}</span>
+
+        <button class="exam-action view-exam-btn"
+                type="button" data-exam-id="${escapeHTML(exam.id)}">
+          View Details <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+/* ================= EMPTY STATE ================= */
+
+function renderEmpty(container, title, description) {
+  container.innerHTML = `
+    <div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">
+        <i class="fa-regular fa-calendar-xmark"></i>
+      </div>
+      <h3>${escapeHTML(title)}</h3>
+      <p>${escapeHTML(description)}</p>
+    </div>
+  `;
+}
+
+/* ================= LOAD EXAMS ================= */
+
+async function loadExams() {
+  const upcomingContainer = $('upcoming');
+  const pastContainer = $('past');
+
+  setLoading(upcomingContainer, 'Loading upcoming exams...');
+  setLoading(pastContainer, 'Loading past exams...');
+
+  try {
+    const { data, error } = await db
+      .from('exams')
+      .select('id, exam_title, exam_date, start_time, end_time, subject_id, section_id, room_id, created_at')
+      .order('exam_date', { ascending: true });
+
+    if (error) throw error;
+
+    exams = data || [];
+
+    const upcoming = exams.filter(exam => !isPast(exam));
+    const past = exams.filter(isPast);
+
+    $('totalExams').textContent = exams.length;
+    $('upcomingExams').textContent = upcoming.length;
+    $('thisWeekExams').textContent = upcoming.filter(isThisWeek).length;
+    $('completedExams').textContent = past.length;
+
+    document.querySelector('#upcoming')
+      .closest('.section')
+      .querySelector('.section-count').textContent = upcoming.length;
+
+    document.querySelector('#past')
+      .closest('.section')
+      .querySelector('.section-count').textContent = past.length;
+
+    if (upcoming.length) {
+      upcomingContainer.innerHTML = upcoming
+        .map(exam => renderExamCard(exam))
+        .join('');
+    } else {
+      renderEmpty(
+        upcomingContainer,
+        'No upcoming exams',
+        'Add an exam to see your schedule here.'
+      );
+    }
+
+    if (past.length) {
+      pastContainer.innerHTML = past
+        .slice()
+        .reverse()
+        .map(exam => renderExamCard(exam, true))
+        .join('');
+    } else {
+      renderEmpty(
+        pastContainer,
+        'No past exams yet',
+        'Completed exams will appear here automatically.'
+      );
+    }
+
+  } catch (error) {
+    console.error('Could not load exams:', error);
+
+    setLoading(
+      upcomingContainer,
+      'Could not load exams. Check your connection and Supabase policies.'
+    );
+
+    setLoading(
+      pastContainer,
+      'Past exams could not be loaded.'
+    );
+
+    notify(error.message || 'Failed to load exams.', 'error');
+  }
+}
+
+/* ================= SAVE EXAM ================= */
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const examTitle = $('examTitleInput').value.trim();
+  const examDate = $('examDateInput').value;
+  const startTime = $('examStartInput').value;
+  const endTime = $('examEndInput').value;
+
+  if (!examTitle || !examDate) {
+    notify('Please enter the exam title and date.', 'error');
+    return;
+  }
+
+  if (examDate < localDateString()) {
+    notify('Please choose today or a future date for a new exam.', 'error');
+    return;
+  }
+
+  if (startTime && endTime && endTime <= startTime) {
+    notify('End time must be later than start time.', 'error');
+    return;
+  }
+
+  saveBtn.disabled = true;
+  saveBtn.innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+  const record = {
+    exam_title: examTitle,
+    exam_date: examDate,
+    start_time: startTime || null,
+    end_time: endTime || null
+  };
+
+  try {
+    const { error } = await db
+      .from('exams')
+      .insert(record);
+
+    if (error) throw error;
+
+    closeModal();
+    notify('Exam saved successfully!', 'success');
+
+    await loadExams();
+
+  } catch (error) {
+    console.error('Could not save exam:', error);
+
+    notify(
+      error.message || 'Could not save exam. Check Supabase RLS policies.',
+      'error'
+    );
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML =
+      '<i class="fa-solid fa-floppy-disk"></i> Save Exam';
+  }
+});
+
+/* ================= BUTTONS ================= */
+
+$('addExamBtn').addEventListener('click', openModal);
+$('closeExamModal').addEventListener('click', closeModal);
+$('cancelExamBtn').addEventListener('click', closeModal);
+
+modal.addEventListener('click', (event) => {
+  if (event.target === modal) closeModal();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeModal();
+});
+
+document.addEventListener('click', (event) => {
+  const button = event.target.closest('.view-exam-btn');
+
+  if (!button) return;
+
+  const exam = exams.find(item => item.id === button.dataset.examId);
+
+  if (!exam) {
+    notify('Exam details could not be found.', 'error');
+    return;
+  }
+
+  const time = exam.start_time
+    ? `${formatTime(exam.start_time)}${exam.end_time ? ' – ' + formatTime(exam.end_time) : ''}`
+    : 'To be confirmed';
+
+  alert(
+    `Exam Details\n\n` +
+    `Title: ${exam.exam_title}\n` +
+    `Date: ${formatDate(exam.exam_date)}\n` +
+    `Time: ${time}\n` +
+    `Status: ${isPast(exam) ? 'Completed' : 'Upcoming'}`
+  );
+});
+
+/* ================= DATE & LOGOUT ================= */
+
+$('todayDate').textContent = new Date().toLocaleDateString('en-US', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+$('logoutBtn').addEventListener('click', async () => {
+  $('logoutBtn').disabled = true;
+
+  try {
+    const { error } = await db.auth.signOut();
+    if (error) throw error;
+
+    window.location.href = 'index.html';
+  } catch (error) {
+    console.error('Logout error:', error);
+    notify('Logout failed. Please try again.', 'error');
+    $('logoutBtn').disabled = false;
+  }
+});
+
+/* ================= INITIALIZE ================= */
+
+loadExams();
+</script>
 </body>
 </html>
